@@ -9,12 +9,7 @@ import constants
 Al = 3.14/4
 Az = 3.14/4
 
-[l1, l2, time_for_each_moviment, steps, previous_position] = constants.get_constants()
-
-# #Zenith
-# first_position=[0,0]
-# next_position=[Az, Al]
-
+[l1, l2, time_for_each_moviment, steps, previous_position, current_position] = constants.get_constants()
 
 def main():   
     # Calculating Transformations for the robot
@@ -33,12 +28,11 @@ def main():
     T32 = R32*D32
 
     T30 = T10*T21*T32
-    # pprint(T30)
 
     # Calculating Transformations for the task
     Als = Symbol('Al')
     Azs = Symbol('Az')
-    rs = Symbol('r')
+    rs = get_radius_distance(T30)
     R50 = utils.rotate_matrix('z', Azs)
     D50 = utils.position_matrix([0, 0, 0, 1])
     T50 = R50*D50
@@ -50,31 +44,25 @@ def main():
     T76 = eye(4)*utils.position_matrix([rs, 0, 0, 1])
 
     T75 = T50*T65*T76
-    # pprint(T75)
 
-    # # Calculating equation for q1 and q2
-    # q1s = Azs
+    # Calculating equation for q1 and q2
+    q1s = Azs
 
-    # l1s = robot["l1"][2]
-    # l2s = robot["l2"][0]
+    l1s = robot["l1"][2]
+    l2s = robot["l2"][0]
 
-    # A = (l2s/cos(Al))**2
-    # B = l2s**2 + l1s**2
-    # C = 2*l1s*l2s
-    # D = -1 + B/A
-    # E = C/A
+    A = (l2s/cos(Al))**2
+    B = l2s**2 + l1s**2
+    C = 2*l1s*l2s
+    D = -1 + B/A
+    E = C/A
 
-    # q2s = asin((-E + sqrt(E**2 - 4*D))/2)
+    q2s = asin((-E + sqrt(E**2 - 4*D))/2)
 
-    # q1 = q1s.subs(Azs, Az)
-    # # pprint(q1)
-    # q2 = q2s.subs([(l1s,l1), (l2s, l2), (Als, Al)])
-    # # pprint(q2)
-
-
-    current_position = [0,0,0]
-    next_position = [0.3,0.5,1]
     # loop start
+    q1 = q1s.subs(Azs, Az)
+    q2 = q2s.subs([(l1s,l1), (l2s, l2), (Als, Al)])
+    next_position = calculate_position(T75, [(l1s,l1), (l2s, l2), (Als, Al), (Azs, Az), (qs[1], q1), (qs[2], q2)])
     position =  utils.get_parametrization(current_position, next_position, time_for_each_moviment, steps)
     for i in position:
         T03 = 
@@ -108,8 +96,13 @@ def main():
 
 #     plt.show()
 
-def calculate_position(T, az, al):
-    pprint(T(:,4))
+def get_radius_distance(T):
+    array = T[0:3,3]
+    return sqrt(array[0]**2 + array[1]**2 + array[2]**2)
 
+def calculate_position(T, subs):
+    array = T[0:3,3].subs(subs)
+    return [array[0], array[1], array[2]]
+    
 if __name__ == "__main__":
     main()

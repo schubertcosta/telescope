@@ -32,7 +32,6 @@ def main():
     # Calculating Transformations for the task
     Als = Symbol('Al')
     Azs = Symbol('Az')
-    rs = get_radius_distance(T30)
     R50 = utils.rotate_matrix('z', Azs)
     D50 = utils.position_matrix([0, 0, 0, 1])
     T50 = R50*D50
@@ -41,9 +40,13 @@ def main():
     D65 = utils.position_matrix([0, 0, 0, 1])
     T65 = R65*D65
 
+    # rs = get_radius_distance(T30)
+    rs = Symbol('r')
     T76 = eye(4)*utils.position_matrix([rs, 0, 0, 1])
 
     T75 = T50*T65*T76
+
+    # pprint(T75)
 
     # Calculating equation for q1 and q2
     q1s = Azs
@@ -62,10 +65,20 @@ def main():
     # loop start
     q1 = q1s.subs(Azs, Az)
     q2 = q2s.subs([(l1s,l1), (l2s, l2), (Als, Al)])
-    next_position = calculate_position(T75, [(l1s,l1), (l2s, l2), (Als, Al), (Azs, Az), (qs[1], q1), (qs[2], q2)])
-    position =  utils.get_parametrization(current_position, next_position, time_for_each_moviment, steps)
-    for i in position:
-        T03 = 
+    T75_radius_adapted = T75.subs([(rs, get_radius_distance(T30))])
+    next_position = calculate_position(T75_radius_adapted, [(l1s,l1), (l2s, l2), (Als, Al), (Azs, Az), (qs[1], q1), (qs[2], q2)])
+    positions =  utils.get_parametrization(current_position, next_position, time_for_each_moviment, steps)
+    q1_inter = []
+    q2_inter = []
+
+    for next_intermediate_position in positions:
+        radius = sqrt(next_intermediate_position[0]**2 + next_intermediate_position[1]**2 + next_intermediate_position[2]**2)
+        Al_inter = asin(next_intermediate_position[2]/radius)
+        Az_inter = atan(next_intermediate_position[1]/next_intermediate_position[1])
+
+        q1_inter.append(q1s.subs(Azs, Az_inter))
+        q2_inter.append(q2s.subs([(l1s,l1), (l2s, l2), (Als, Al_inter)]))
+    
 
     
     # https://stackoverflow.com/questions/38118598/3d-animation-using-matplotlib
@@ -80,21 +93,30 @@ def main():
 
     # # pprint(coordinates)
 
-    # plot_chart(coordinates)
+    plot_chart(positions)
 
-# def plot_chart(coordinates):
-#     plt.axes(projection='3d')
+def plot_chart(coordinates):
+    # plt.axes(projection='3d')
 
-#     # Data for a three-dimensional line
-#     r = np.linspace(0, 5, 500)
-#     xline = r*np.cos(Al)*np.cos(Az)
-#     yline = r*np.cos(Al)*np.sin(Az)
-#     zline = r*np.sin(Al)
-#     plt.plot(xline, yline, zline, color = "blue")
+    # # Data for a three-dimensional line
+    # r = np.linspace(0, 5, 500)
+    # xline = r*np.cos(Al)*np.cos(Az)
+    # yline = r*np.cos(Al)*np.sin(Az)
+    # zline = r*np.sin(Al)
+    # plt.plot(xline, yline, zline, color = "blue")
+    pprint(coordinates)
 
-#     plt.plot([coordinates[0]],[coordinates[1]],[coordinates[2]], marker='o', markersize=3, color="red")
+    
 
-#     plt.show()
+    x,y,z = zip(coordinates)
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.plot(x, y, z, '.')
+    ax.legend()
+    plt.show()
+    # plt.scatter(coordinates[:,0],coordinates[:,1], coordinates[:,2])
+
+    # plt.show()
 
 def get_radius_distance(T):
     array = T[0:3,3]

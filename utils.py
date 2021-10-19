@@ -45,4 +45,5 @@ def get_parametrization(previous_position, next_position, time_for_each_moviment
         # d_position.append(k1 + 2*k2*t + 3*k3*t**2)
         # dd_position.append(2*k2 + 6*k3*t)
 
+    position.reshape(-1,1)
     return position

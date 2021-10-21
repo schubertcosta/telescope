@@ -1,3 +1,4 @@
+from matplotlib.pyplot import axes
 from sympy import *
 import numpy as np
 
@@ -30,20 +31,16 @@ def position_matrix(position):
         position]).T
 
 def get_parametrization(previous_position, next_position, time_for_each_moviment, steps):
-    count = 0
     position = []
     d_position = []
     dd_position = []
 
     for t in np.linspace(0, time_for_each_moviment, num = steps):
-        count = count + 1
         k0 = previous_position
         k1 = 0
         k2 = 3*np.subtract(next_position,previous_position)/time_for_each_moviment**2
         k3 = -2*np.subtract(next_position,previous_position)/time_for_each_moviment**3
-        position.append(k0 + k1*t + k2*t**2 + k3*t**3)
+        position.append(k0 + k1*t + k2*t**2 + k3*t**3)        
         # d_position.append(k1 + 2*k2*t + 3*k3*t**2)
         # dd_position.append(2*k2 + 6*k3*t)
-
-    position.reshape(-1,1)
     return position

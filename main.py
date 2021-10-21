@@ -9,25 +9,26 @@ import constants
 Al = 3.14/4
 Az = 3.14/4
 
-[l1, l2, time_for_each_moviment, steps, previous_position, current_position] = constants.get_constants()
+[l1, l2, time_for_each_moviment, steps, current_position] = constants.get_constants()
 
 def main():   
     # Calculating Transformations for the robot
     robot  = variables.get_robot_variables()
-    qs = symbols('q0:3')
-    R10 = utils.rotate_matrix('z', qs[1])
+    qs = symbols('q1:3')
+    R10 = utils.rotate_matrix('z', qs[0])
     D10 = utils.position_matrix(robot["l1"])
     T10 = R10*D10
     
-    R21 = utils.rotate_matrix('y', -qs[2])
+    R21 = utils.rotate_matrix('y', -qs[1])
     D21 = utils.position_matrix(robot["l2"])
     T21 = R21*D21
 
-    R32 = utils.rotate_matrix('y', -(Al - qs[2]))
+    R32 = utils.rotate_matrix('y', -(Al - qs[1]))
     D32 = utils.position_matrix([0, 0, 0, 1])
     T32 = R32*D32
 
     T30 = T10*T21*T32
+    # pprint(T30)
 
     # Calculating Transformations for the task
     Als = Symbol('Al')
@@ -54,30 +55,43 @@ def main():
     l1s = robot["l1"][2]
     l2s = robot["l2"][0]
 
-    A = (l2s/cos(Al))**2
+    A = (l2s/cos(Als))**2
     B = l2s**2 + l1s**2
     C = 2*l1s*l2s
     D = -1 + B/A
     E = C/A
 
     q2s = asin((-E + sqrt(E**2 - 4*D))/2)
-
+    # pprint(q2s)
     # loop start
-    q1 = q1s.subs(Azs, Az)
-    q2 = q2s.subs([(l1s,l1), (l2s, l2), (Als, Al)])
+   
     T75_radius_adapted = T75.subs([(rs, get_radius_distance(T30))])
-    next_position = calculate_position(T75_radius_adapted, [(l1s,l1), (l2s, l2), (Als, Al), (Azs, Az), (qs[1], q1), (qs[2], q2)])
-    positions =  utils.get_parametrization(current_position, next_position, time_for_each_moviment, steps)
-    q1_inter = []
-    q2_inter = []
+    # pprint(T75_radius_adapted)
+    # next_position = calculate_position(T75_radius_adapted, [(l1s,l1), (l2s, l2), (Als, Al), (Azs, Az), (qs[0], q1), (qs[1], q2)])
 
-    for next_intermediate_position in positions:
-        radius = sqrt(next_intermediate_position[0]**2 + next_intermediate_position[1]**2 + next_intermediate_position[2]**2)
-        Al_inter = asin(next_intermediate_position[2]/radius)
-        Az_inter = atan(next_intermediate_position[1]/next_intermediate_position[1])
 
-        q1_inter.append(q1s.subs(Azs, Az_inter))
-        q2_inter.append(q2s.subs([(l1s,l1), (l2s, l2), (Als, Al_inter)]))
+    positions =  utils.get_parametrization(current_position, [Az, Al], time_for_each_moviment, steps)
+    # q1_inter = []
+    # q2_inter = []
+
+    for next_intermediate_angle in positions:
+        q1 = q1s.subs(Azs, next_intermediate_angle[0])
+        q2 = q2s.subs([(l1s,l1), (l2s, l2), (Als, next_intermediate_angle[1])])
+
+        next_position = calculate_position(T75_radius_adapted, [(l1s,l1), (l2s, l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
+        pprint(next_position)
+
+
+    #     radius = sqrt(next_intermediate_position[0]**2 + next_intermediate_position[1]**2 + next_intermediate_position[2]**2)
+         
+    #     Al_inter = asin(next_intermediate_position[2]/radius)
+    #     Az_inter = atan(next_intermediate_position[1]/next_intermediate_position[0])
+
+    #     pprint(Az_inter)
+        # print('Al - ' + Al_inter + ' Az - ' + Az_inter)
+
+    #     q1_inter.append(q1s.subs(Azs, Az_inter))
+    #     q2_inter.append(q2s.subs([(l1s,l1), (l2s, l2), (Als, Al_inter)]))
     
 
     
@@ -93,7 +107,7 @@ def main():
 
     # # pprint(coordinates)
 
-    plot_chart(positions)
+    # plot_chart(positions)
 
 def plot_chart(coordinates):
     # plt.axes(projection='3d')
@@ -104,7 +118,7 @@ def plot_chart(coordinates):
     # yline = r*np.cos(Al)*np.sin(Az)
     # zline = r*np.sin(Al)
     # plt.plot(xline, yline, zline, color = "blue")
-    pprint(coordinates)
+    # pprint(coordinates)
 
     
 
@@ -120,6 +134,7 @@ def plot_chart(coordinates):
 
 def get_radius_distance(T):
     array = T[0:3,3]
+    # pprint(array)
     return sqrt(array[0]**2 + array[1]**2 + array[2]**2)
 
 def calculate_position(T, subs):

@@ -18,16 +18,18 @@ def main():
     R10 = utils.rotate_matrix('z', qs[0])
     D10 = utils.position_matrix(robot["l1"])
     T10 = R10*D10
+    pprint(T10)
     
     R21 = utils.rotate_matrix('y', -qs[1])
     D21 = utils.position_matrix(robot["l2"])
     T21 = R21*D21
+    T20 = T10*T21
 
     R32 = utils.rotate_matrix('y', -(Al - qs[1]))
     D32 = utils.position_matrix([0, 0, 0, 1])
     T32 = R32*D32
 
-    T30 = T10*T21*T32
+    T30 = T20*T32
     # pprint(T30)
 
     # Calculating Transformations for the task
@@ -41,7 +43,6 @@ def main():
     D65 = utils.position_matrix([0, 0, 0, 1])
     T65 = R65*D65
 
-    # rs = get_radius_distance(T30)
     rs = Symbol('r')
     T76 = eye(4)*utils.position_matrix([rs, 0, 0, 1])
 
@@ -63,78 +64,49 @@ def main():
 
     q2s = asin((-E + sqrt(E**2 - 4*D))/2)
     # pprint(q2s)
-    # loop start
-   
+
+    # loop start   
     T75_radius_adapted = T75.subs([(rs, get_radius_distance(T30))])
     # pprint(T75_radius_adapted)
-    # next_position = calculate_position(T75_radius_adapted, [(l1s,l1), (l2s, l2), (Als, Al), (Azs, Az), (qs[0], q1), (qs[1], q2)])
 
+    angles =  utils.get_parametrization(current_position, [Az, Al], time_for_each_moviment, steps)
+    positions = []
+    q = []
+    pprint(angles)
 
-    positions =  utils.get_parametrization(current_position, [Az, Al], time_for_each_moviment, steps)
-    # q1_inter = []
-    # q2_inter = []
-
-    for next_intermediate_angle in positions:
+    for next_intermediate_angle in angles:
         q1 = q1s.subs(Azs, next_intermediate_angle[0])
         q2 = q2s.subs([(l1s,l1), (l2s, l2), (Als, next_intermediate_angle[1])])
 
-        next_position = calculate_position(T75_radius_adapted, [(l1s,l1), (l2s, l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
-        pprint(next_position)
+        q.append([q1, q2])
+        positions.append(calculate_position(T75_radius_adapted, [(l1s,l1), (l2s, l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)]))
 
-
-    #     radius = sqrt(next_intermediate_position[0]**2 + next_intermediate_position[1]**2 + next_intermediate_position[2]**2)
-         
-    #     Al_inter = asin(next_intermediate_position[2]/radius)
-    #     Az_inter = atan(next_intermediate_position[1]/next_intermediate_position[0])
-
-    #     pprint(Az_inter)
-        # print('Al - ' + Al_inter + ' Az - ' + Az_inter)
-
-    #     q1_inter.append(q1s.subs(Azs, Az_inter))
-    #     q2_inter.append(q2s.subs([(l1s,l1), (l2s, l2), (Als, Al_inter)]))
-    
-
-    
-    # https://stackoverflow.com/questions/38118598/3d-animation-using-matplotlib
-
-
-
-    # x = l2*cos(q1)*cos(q2)
-    # y = l2*sin(q1)*cos(q2)
-    # z = l1 + l2*sin(q2)
-
-    # coordinates = [x, y, z]
-
-    # # pprint(coordinates)
-
-    # plot_chart(positions)
+    plot_chart(positions)
 
 def plot_chart(coordinates):
-    # plt.axes(projection='3d')
-
-    # # Data for a three-dimensional line
-    # r = np.linspace(0, 5, 500)
-    # xline = r*np.cos(Al)*np.cos(Az)
-    # yline = r*np.cos(Al)*np.sin(Az)
-    # zline = r*np.sin(Al)
-    # plt.plot(xline, yline, zline, color = "blue")
-    # pprint(coordinates)
-
+    x = (list(map(lambda x: x[0], coordinates)))
+    y = (list(map(lambda x: x[1], coordinates)))
+    z = (list(map(lambda x: x[2], coordinates)))
     
-
-    x,y,z = zip(coordinates)
     fig = plt.figure()
     ax = fig.gca(projection='3d')
+    limit = l1 + l2
+    ax.set_xlim3d(0, limit)
+    ax.set_ylim3d(0, limit)
+    ax.set_zlim3d(0, limit)
+    ax = set_quiver(ax)
     ax.plot(x, y, z, '.')
     ax.legend()
     plt.show()
-    # plt.scatter(coordinates[:,0],coordinates[:,1], coordinates[:,2])
 
-    # plt.show()
+def set_quiver(ax):
+    x, y, z = np.array([[0,0,0],[0,0,0],[0,0,0]])
+    u, v, w = np.array([[1,0,0],[0,1,0],[0,0,1]])
+    ax.quiver(x,y,z,u,v,w,arrow_length_ratio=0.1, color="black")
+    return ax
 
 def get_radius_distance(T):
     array = T[0:3,3]
-    # pprint(array)
     return sqrt(array[0]**2 + array[1]**2 + array[2]**2)
 
 def calculate_position(T, subs):

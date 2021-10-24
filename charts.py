@@ -15,6 +15,7 @@ def plot_chart(coordinates):
     ax.set_zlim3d(0, limit)
     ax = set_quiver(ax)
     ax.plot(x, y, z, '.')
+    plt.title("Position of the tip of the telescope", loc="center")
     plt.show()
 
 def set_quiver(ax):

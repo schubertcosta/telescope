@@ -9,10 +9,9 @@ def plot_chart(coordinates):
     
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    limit = constants.l1 + constants.l2
-    ax.set_xlim3d(0, limit)
-    ax.set_ylim3d(0, limit)
-    ax.set_zlim3d(0, limit)
+    ax.set_xlim3d(-constants.l2*1.2, constants.l2*1.2)
+    ax.set_ylim3d(-constants.l2*1.2, constants.l2*1.2)
+    ax.set_zlim3d(0, constants.l1 + constants.l2)
     ax = set_quiver(ax)
     ax.plot(x, y, z, '.')
     plt.title("Position of the tip of the telescope", loc="center")

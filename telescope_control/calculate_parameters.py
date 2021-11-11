@@ -3,13 +3,8 @@ import utils
 from sympy import *
 import constants
 import charts
-import numpy as np
 
-# Position of the celestial object Al = Altitude, Az = Azimuth
-# Al = 3.14/4
-# Az = 3.14/4
-
-def calculate_parameters(Az, Al):   
+def calculate_parameters(az, al):   
     # Calculating Transformations for the robot
     robot  = variables.get_robot_variables()
     qs = symbols('q1:3')
@@ -22,7 +17,7 @@ def calculate_parameters(Az, Al):
     T21 = R21*D21
     T20 = T10*T21
 
-    R32 = utils.rotate_matrix('y', -(Al - qs[1]))
+    R32 = utils.rotate_matrix('y', -(al - qs[1]))
     D32 = utils.position_matrix([0, 0, 0, 1])
     T32 = R32*D32
 
@@ -60,7 +55,7 @@ def calculate_parameters(Az, Al):
     # loop start   
     T75_radius_adapted = T75.subs([(rs, T30[0:3,3].norm())])
 
-    angles =  utils.get_parametrization(constants.current_position, [Az, Al], constants.time_for_each_moviment, constants.steps)
+    angles =  utils.get_parametrization(constants.current_position, [az, al], constants.time_for_each_moviment, constants.steps)
     positions = []
     q = []
 

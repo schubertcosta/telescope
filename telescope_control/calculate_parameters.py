@@ -6,10 +6,10 @@ import charts
 import numpy as np
 
 # Position of the celestial object Al = Altitude, Az = Azimuth
-Al = 3.14/4
-Az = 3.14/4
+# Al = 3.14/4
+# Az = 3.14/4
 
-def main():   
+def calculate_parameters(Az, Al):   
     # Calculating Transformations for the robot
     robot  = variables.get_robot_variables()
     qs = symbols('q1:3')
@@ -117,4 +117,4 @@ def get_best_q2(q2s, sub_params, previous_q2):
     exit()
     
 if __name__ == "__main__":
-    main()
+    calculate_parameters()

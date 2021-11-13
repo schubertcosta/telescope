@@ -2,8 +2,6 @@ import variables
 import utils
 from sympy import *
 import constants
-import charts
-import numpy as np
 
 # Calculating Transformations for the robot
 robot  = variables.get_robot_variables()
@@ -51,8 +49,7 @@ last_position = constants.initial_position
 
 def calculate_parameters(az, al):
     global last_position
-    print("last position -> %s" % last_position)
-    print("target position -> %s" % [az, al])
+
     # Calculating rotation in y axis
     R32 = utils.rotate_matrix('y', -(al - qs[1]))
     D32 = utils.position_matrix([0, 0, 0, 1])
@@ -75,8 +72,8 @@ def calculate_parameters(az, al):
 
         R75 = T75_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
         positions.append(R75)
-    print(angles)
-    charts.plot_chart(positions)
+        
+    return positions
 
 def get_best_q1(q1s, sub_params):
     range = constants.q1_limit

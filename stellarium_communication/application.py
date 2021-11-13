@@ -1,5 +1,5 @@
 
-from stellarium_communication.coords import deg_2_degStr
+from charts.charts import ChartUpdate
 from telescope_control.calculate_parameters import calculate_parameters
 from telescope_server import Telescope_Server
 from queue import Queue
@@ -10,12 +10,16 @@ import stellarium_api
 import coords
 
 def stellarium_api_communication(queue):
+    chart = ChartUpdate()
+    chart.on_launch()
     while True:
-        queue.get()
+        queue.get()   
+
         (azs, als) = stellarium_api.get_current_position_focus()
         (az, al) = coords.degStr_2_rad(azs), coords.degStr_2_rad(als)
-        
-        calculate_parameters(az, al)
+
+        positions = calculate_parameters(az, al)
+        chart.plot_chart(positions)
 
         queue.task_done()
 
@@ -24,7 +28,7 @@ def stellarium_telescope_server(queue):
     test.run()
 
 class Application():
-    queue = Queue()
+    queue = Queue() 
     stellarium_api_thread = Thread(target=stellarium_api_communication, args=(queue,))
     stellarium_api_thread.daemon = True
     stellarium_thread = Thread(target=stellarium_telescope_server, args=(queue,))

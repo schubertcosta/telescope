@@ -20,14 +20,12 @@ class ChartUpdate():
         self.fig.canvas.flush_events()
 
     def on_running(self, coordinates):
+        color = np.random.rand(3,)
+        for (x,y,z) in coordinates:
+            plt.pause(0.3)
+            self.ax.scatter(x, y, z, color=color)
+            self.draw()        
         
-        x = (list(map(lambda x: x[0], coordinates)))
-        y = (list(map(lambda y: y[1], coordinates)))
-        z = (list(map(lambda z: z[2], coordinates)))
-        
-        self.ax.scatter(x, y, z, c=np.random.rand(3,))
-        self.draw()
-
     def set_quiver(self):
         x, y, z = np.array([[0,0,0],[0,0,0],[0,0,0]])
         u, v, w = np.array([[1,0,0],[0,1,0],[0,0,1]])

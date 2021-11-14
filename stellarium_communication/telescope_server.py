@@ -5,7 +5,7 @@ import logging
 from threading import Thread
 import asyncore, socket
 from time import sleep, time
-from bitstring import BitArray, BitStream, ConstBitStream
+from bitstring import ConstBitStream
 import coords
  
 logging.basicConfig(level=logging.DEBUG, format="%(filename)s: %(funcName)s - %(levelname)s: %(message)s")

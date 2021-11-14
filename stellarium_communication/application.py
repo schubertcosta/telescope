@@ -19,7 +19,7 @@ def stellarium_api_communication(queue):
         (az, al) = coords.degStr_2_rad(azs), coords.degStr_2_rad(als)
 
         positions = calculate_parameters(az, al)
-        chart.plot_chart(positions)
+        chart.plot_chart(positions, queue)
 
         queue.task_done()
 
@@ -28,7 +28,7 @@ def stellarium_telescope_server(queue):
     test.run()
 
 class Application():
-    queue = Queue() 
+    queue = Queue()     
     stellarium_api_thread = Thread(target=stellarium_api_communication, args=(queue,))
     stellarium_api_thread.daemon = True
     stellarium_thread = Thread(target=stellarium_telescope_server, args=(queue,))

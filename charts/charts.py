@@ -31,7 +31,10 @@ class ChartUpdate():
         u, v, w = np.array([[1,0,0],[0,1,0],[0,0,1]])
         self.ax.quiver(x,y,z,u,v,w,arrow_length_ratio=0.1, color="black")        
 
-    def plot_chart(self, coordinates, queue):
+    def plot_chart(self, coordinates, queue, block = False):
         self.on_running(coordinates)
-        while queue.empty():
-            plt.pause(0.01)
+        if queue:
+            while queue.empty():
+                plt.pause(0.01)
+        elif block:
+            plt.show(block=True)

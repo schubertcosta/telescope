@@ -1,7 +1,13 @@
 import utils
 from sympy import *
+
+import sys
+sys.path.insert(1, '../telescope')
+sys.path.insert(1, '../charts')
+from charts.charts import ChartUpdate
 import constants
-from numpy import pi
+from numpy import pi, zeros
+import time
 
 # Calculating Transformations for the robot
 robot  = constants.robot_structure
@@ -31,7 +37,6 @@ T76 = eye(4)*utils.position_matrix([rs, 0, 0, 1])
 T75 = T50*T65*T76
 
 # Calculating equation for q1 and q2
-q1s = [Azs]
 
 l1s = robot["l1"][2]
 l2s = robot["l2"][0]
@@ -46,11 +51,16 @@ q2s = [asin((-E + sqrt(E**2 - 4*D))/2),  asin((-E - sqrt(E**2 - 4*D))/2)]
 
 # That is the telescope last position
 last_position = constants.initial_position
+last_q_position = constants.initial_q_position
 
 def calculate_parameters(az, al):
     global last_position
+    global last_q_position
 
-    # (az, al) = normalize_coordinates(az, al, last_position)
+    (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi], last_position[1])]
+    
+    # Since az and al are always greated then 0
+    q1s = [Azs]
 
     # Calculating rotation in y axis
     R32 = utils.rotate_matrix('y', -(al - qs[1]))
@@ -65,43 +75,27 @@ def calculate_parameters(az, al):
     positions = []
     q = []
 
-    for index, next_intermediate_angle in enumerate(angles):
-        q1 = get_best_q(q1s, [(Azs, next_intermediate_angle[0])], constants.q1_limit, 1, last_position[0] if index == 0 else angles[index-1][0])
-        q2 = get_best_q(q2s, [(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1])], constants.q2_limit, 2, last_position[1] if index == 0 else angles[index-1][1])
+    for next_intermediate_angle in angles:
+        q1 = get_best_q(q1s, [(Azs, next_intermediate_angle[0])], constants.q1_limit, 1, last_q_position[0])
+        q2 = get_best_q(q2s, [(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1])], constants.q2_limit, 2, last_q_position[1])
 
         q.append([q1, q2])
         last_position = next_intermediate_angle
+        last_q_position = [q1, q2]
 
         R75 = T75_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
         positions.append(R75)
         
     return positions
 
-def normalize_coordinates(az, al, last_position):
-    az_data = [az, -2*pi + az]
-    q1_list = []
-    az_new = az
-    al_new = al
-
-    for az_current in az_data:
-        try:
-            q1_list.append(get_best_q(q1s, [(Azs, az_current)], constants.q1_limit, 1))
-        except Exception as error:
-            print('Caught this error: ' + repr(error))
-            continue
-    
-    if len(q1_list) == 0:
-        print("There is no q1 valid, please review the code or the telescope limits")
-        exit()
-    else:
-        # just because q1=az
-        max = 2*pi
-        for q in q1_list:
-            if abs(q-last_position[0]) < max:
-                az_new = q
-
-    return az_new, al_new
-
+def get_faster_route(angles, last_position):
+    min = 2*pi
+    shortest_angle = last_position
+    for current_angle in angles:
+        if abs(current_angle-last_position) <= min:
+            min = abs(current_angle-last_position)
+            shortest_angle = current_angle
+    return shortest_angle
 
 def get_best_q(qs_array, sub_params, range, q_number, last_position):
     q_array = [qs.subs(sub_params) for qs in qs_array]
@@ -114,43 +108,18 @@ def get_best_q(qs_array, sub_params, range, q_number, last_position):
 
         if im(q):
             q = re(q)
-            
+        
         if q >= range[0] and q <= range[1]:
             q_candidate_array.append(q)
     
     if len(q_candidate_array) == 0:
         print("All candidates for q%d are out of range" % (q_number))
-        raise ValueError("Error - q%d out of range" % (q_number))
+        raise ValueError("Error - q%d out of range. q_array -> %s" % (q_number, q_array))
+
+    return get_faster_route(q_candidate_array, last_position)
     
-    min = 2*pi
-    best_q = q_candidate_array[0]
-    for q in q_candidate_array:
-        if abs(q-last_position) < min:
-            best_q = q
-    return best_q
-
-
-# def get_best_q2(q2s, sub_params, previous_q2):
-#     range = constants.q2_limit
-#     q2_1 = q2s[0].subs(sub_params)
-#     q2_2 = q2s[1].subs(sub_params)
-#     q2 = 0
-
-#     if im(q2_1) >= constants.max_tolerated_imaginary or im(q2_2) >= constants.max_tolerated_imaginary:
-#         print("q2 contains a complex number, q2 =", q2)
-#         exit()
-
-#     if abs(q2_1-previous_q2) >= abs(q2_2-previous_q2):
-#         q2 = q2_2
-#     q2 = q2_1
-#     if im(q2):
-#         q2 = re(q2)
-
-#     if q2 >= range[0] and q2 <= range[1]:
-#         return q2   
-
-#     print("Value of q2 out of range --> q2 = ", q2)
-#     exit()
-    
-if __name__ == "__main__":
-    calculate_parameters(3.14,3.14/4)
+if __name__ == "__main__":    
+    chart = ChartUpdate()
+    chart.on_launch()
+    data = calculate_parameters(2*pi, -pi/2)
+    chart.plot_chart(data, None, True)

@@ -10,9 +10,10 @@ steps = 15
 q1_limit = [-2*pi, 2*pi]
 q2_limit = [-pi/4, pi/2]
 az_limit = [0, 2*pi]
-al_limit = [0, 2*pi]
+al_limit = [0, pi]
 initial_position = [0.0, atan(l1/l2)]
 initial_q_position = [0, 0]
+initial_xyz_position = [l2, 0, l1]
 max_tolerated_imaginary = 0.00001
 # this key belongs to stellarium json response for the current location. If you change the language of stellarium you also need to change this variable here.
 az_alt_key = "Az./Alt.:"

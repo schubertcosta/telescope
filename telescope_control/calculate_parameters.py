@@ -6,11 +6,13 @@ sys.path.insert(1, '../telescope')
 sys.path.insert(1, '../charts')
 from charts.charts import ChartUpdate
 import constants
-from numpy import pi, zeros
-import time
+from numpy import pi
 
 # Calculating Transformations for the robot
 robot  = constants.robot_structure
+Als = Symbol('Al')
+Azs = Symbol('Az')
+
 qs = symbols('q1:3')
 R10 = utils.rotate_matrix('z', qs[0])
 D10 = utils.position_matrix(robot["l1"])
@@ -21,9 +23,14 @@ D21 = utils.position_matrix(robot["l2"])
 T21 = R21*D21
 T20 = T10*T21
 
+# Calculating rotation in y axis
+R32 = utils.rotate_matrix('y', -(Als - qs[1]))
+D32 = utils.position_matrix([0, 0, 0, 1])
+T32 = R32*D32
+
+T30 = T20*T32
+
 # Calculating Transformations for the task
-Als = Symbol('Al')
-Azs = Symbol('Az')
 R50 = utils.rotate_matrix('z', Azs)
 D50 = utils.position_matrix([0, 0, 0, 1])
 T50 = R50*D50
@@ -41,6 +48,8 @@ T75 = T50*T65*T76
 l1s = robot["l1"][2]
 l2s = robot["l2"][0]
 
+q1s = [Azs]
+
 A = (l2s/cos(Als))**2
 B = l2s**2 + l1s**2
 C = 2*l1s*l2s
@@ -52,22 +61,18 @@ q2s = [asin((-E + sqrt(E**2 - 4*D))/2),  asin((-E - sqrt(E**2 - 4*D))/2)]
 # That is the telescope last position
 last_position = constants.initial_position
 last_q_position = constants.initial_q_position
+last_xyz_position = constants.initial_xyz_position
 
 def calculate_parameters(az, al):
     global last_position
     global last_q_position
+    global last_xyz_position
 
-    (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi], last_position[1])]
+    if not (verify_route(az, constants.az_limit) and verify_route(al, constants.al_limit)):
+        return [last_xyz_position]
+    (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]
     
-    # Since az and al are always greated then 0
-    q1s = [Azs]
 
-    # Calculating rotation in y axis
-    R32 = utils.rotate_matrix('y', -(al - qs[1]))
-    D32 = utils.position_matrix([0, 0, 0, 1])
-    T32 = R32*D32
-
-    T30 = T20*T32
     # loop start   
     T75_radius_adapted = T75.subs([(rs, T30[0:3,3].norm())])
 
@@ -84,9 +89,16 @@ def calculate_parameters(az, al):
         last_q_position = [q1, q2]
 
         R75 = T75_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
+        last_xyz_position = R75
+        print(R75)
         positions.append(R75)
         
     return positions
+
+def verify_route(angle, range):
+    if angle >= range[0] and angle <= range[1]:
+        return True
+    return False
 
 def get_faster_route(angles, last_position):
     min = 2*pi

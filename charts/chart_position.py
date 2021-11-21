@@ -3,8 +3,8 @@ import constants
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
-class ChartUpdate():
-    def on_launch(self):
+class ChartPosition():
+    def __init__(self):
         plt.ion()
         self.fig = plt.figure()
         self.ax = Axes3D(self.fig)
@@ -13,22 +13,6 @@ class ChartUpdate():
         self.ax.set_zlim3d(0, constants.l1 + constants.l2)
         self.set_quiver()        
         self.draw()
-
-
-
-        # x = np.linspace(0, 2 * np.pi, 400)
-        # y = np.sin(x ** 2)
-        # self.figs, self.axs = plt.subplots(2, 2)
-        # self.axs[0, 0].plot(x, y)
-        # self.axs[0, 0].set_title("main")
-        # self.axs[1, 0].plot(x, y**2)
-        # self.axs[1, 0].set_title("shares x with main")
-        # self.axs[1, 0].sharex(self.axs[0, 0])
-        # self.axs[0, 1].plot(x + 1, y + 1)
-        # self.axs[0, 1].set_title("unrelated")
-        # self.axs[1, 1].plot(x + 2, y + 2)
-        # self.axs[1, 1].set_title("also unrelated")
-        # self.figs.tight_layout()
     
     def draw(self):
         self.fig.canvas.draw()
@@ -46,10 +30,7 @@ class ChartUpdate():
         u, v, w = np.array([[1,0,0],[0,1,0],[0,0,1]])
         self.ax.quiver(x,y,z,u,v,w,arrow_length_ratio=0.1, color="black")        
 
-    def plot_chart(self, coordinates, queue, block = False):
+    def plot_chart(self, coordinates, block = False):
         self.on_running(coordinates)
-        if queue:
-            while queue.empty():
-                plt.pause(0.01)
-        elif block:
+        if block:
             plt.show(block=True)

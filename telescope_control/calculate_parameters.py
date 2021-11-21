@@ -1,10 +1,9 @@
+from charts.chart_position import ChartPosition
 import utils
 from sympy import *
-
 import sys
 sys.path.insert(1, '../telescope')
 sys.path.insert(1, '../charts')
-from charts.charts import ChartUpdate
 import constants
 from numpy import pi
 
@@ -90,10 +89,10 @@ def calculate_parameters(az, al):
 
         R75 = T75_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
         last_xyz_position = R75
-        print(R75)
         positions.append(R75)
-        
-    return positions
+    
+    print(q)
+    return [positions, q]
 
 def verify_route(angle, range):
     if angle >= range[0] and angle <= range[1]:
@@ -131,7 +130,6 @@ def get_best_q(qs_array, sub_params, range, q_number, last_position):
     return get_faster_route(q_candidate_array, last_position)
     
 if __name__ == "__main__":    
-    chart = ChartUpdate()
-    chart.on_launch()
+    chart = ChartPosition()
     data = calculate_parameters(2*pi, -pi/2)
-    chart.plot_chart(data, None, True)
+    chart.plot_chart(data, True)

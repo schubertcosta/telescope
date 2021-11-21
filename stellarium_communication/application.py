@@ -1,5 +1,6 @@
 
-from charts.charts import ChartUpdate
+from charts.chart_angle import ChartAngle
+from charts.chart_position import ChartPosition
 from telescope_control.calculate_parameters import calculate_parameters
 from telescope_server import Telescope_Server
 from queue import Queue
@@ -8,18 +9,24 @@ import logging
 import time
 import stellarium_api
 import coords
+import matplotlib.pyplot as plt
 
 def stellarium_api_communication(queue):
-    chart = ChartUpdate()
-    chart.on_launch()
+    chart = ChartPosition()
+    chart_angles = ChartAngle()
     while True:
         queue.get()   
 
         (azs, als) = stellarium_api.get_current_position_focus()
         (az, al) = coords.degStr_2_rad(azs), coords.degStr_2_rad(als)
 
-        positions = calculate_parameters(az, al)
-        chart.plot_chart(positions, queue)
+        [positions, angles] = calculate_parameters(az, al)
+        chart.plot_chart(positions)
+        chart_angles.plot_chart(angles)
+
+        if queue:
+            while queue.empty():
+                plt.pause(0.01)
 
         queue.task_done()
 

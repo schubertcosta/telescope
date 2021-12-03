@@ -5,7 +5,7 @@ class ChartAngle():
     def __init__(self):
         plt.ion()
         self.fig, self.axs = plt.subplots(2)
-        self.fig.suptitle("q1 and q2 (telescope)")
+        self.fig.suptitle("q1 and q2 (telescope) in degrees")
         self.draw()
     
     def draw(self):
@@ -20,8 +20,7 @@ class ChartAngle():
         plt.pause(0.3)
         self.axs[0].plot(x, q1_array)
         self.axs[1].plot(x, q2_array)
-        self.draw()      
-             
+        self.draw()                   
 
     def plot_chart(self, coordinates, block = False):
         self.on_running(coordinates)

@@ -1,9 +1,9 @@
-from charts.chart_position import ChartPosition
 import utils
 from sympy import *
 import sys
 sys.path.insert(1, '../telescope')
 sys.path.insert(1, '../charts')
+from charts.chart_position import ChartPosition
 import constants
 from numpy import pi
 
@@ -69,8 +69,7 @@ def calculate_parameters(az, al):
 
     if not (verify_route(az, constants.az_limit) and verify_route(al, constants.al_limit)):
         return [last_xyz_position]
-    (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]
-    
+    (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]    
 
     # loop start   
     T75_radius_adapted = T75.subs([(rs, T30[0:3,3].norm())])

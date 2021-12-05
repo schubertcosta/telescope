@@ -2,26 +2,25 @@ from matplotlib.pyplot import axes
 from sympy import *
 import numpy as np
 
-def rotate_matrix(eixo, q):
-    match eixo:
-        case 'x':
-            return Matrix([\
+def rotate_matrix(axis, q):
+    switcher = {
+        'x': Matrix([\
                 [1, 0, 0, 0],
                 [0, cos(q), -sin(q), 0],
                 [0, sin(q), cos(q), 0],
-                [0, 0, 0, 1]])
-        case 'y':
-            return Matrix([\
+                [0, 0, 0, 1]]),
+        'y': Matrix([\
                 [cos(q), 0, sin(q), 0],
                 [0, 1, 0, 0],
                 [-sin(q), 0, cos(q), 0],
-                [0, 0, 0, 1]])
-        case 'z':
-            return Matrix([\
+                [0, 0, 0, 1]]),
+        'z': Matrix([\
                 [cos(q), -sin(q), 0, 0],
                 [sin(q), cos(q), 0, 0],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1]])
+    }
+    return switcher.get(axis, "Invalid axis")        
 
 def position_matrix(position):
     return Matrix(\

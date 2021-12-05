@@ -10,8 +10,11 @@ import time
 import stellarium_api
 import coords
 import matplotlib.pyplot as plt
+from freecad.pieces_control import start_freecad
+from freecad.pieces_control import set_position
 
 def stellarium_api_communication(queue):
+    doc = start_freecad()
     chart = ChartPosition()
     chart_angles = ChartAngle()
     while True:
@@ -23,6 +26,7 @@ def stellarium_api_communication(queue):
         [positions, angles] = calculate_parameters(az, al)
         chart.plot_chart(positions)
         chart_angles.plot_chart(angles)
+        set_position(doc, angles)
 
         if queue:
             while queue.empty():

@@ -21,3 +21,4 @@ robot_structure = {
     "l1": [0, 0, Symbol('l1'), 1],
     "l2": [Symbol('l2'), 0, 0, 1]
 }
+freecad_path = "G:\\Meu Drive\\Projetos\\Telescopio\\CAD\\First version1\\monting.FCStd"

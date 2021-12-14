@@ -3,7 +3,7 @@ from sympy import *
 import sys
 sys.path.insert(1, '../telescope')
 sys.path.insert(1, '../charts')
-from charts.chart_position import ChartPosition
+# from charts.chart_position import ChartPosition
 import constants
 from numpy import pi
 
@@ -90,7 +90,6 @@ def calculate_parameters(az, al):
         last_xyz_position = R75
         positions.append(R75)
     
-    print(q)
     return [positions, q]
 
 def verify_route(angle, range):
@@ -128,7 +127,7 @@ def get_best_q(qs_array, sub_params, range, q_number, last_position):
 
     return get_faster_route(q_candidate_array, last_position)
     
-if __name__ == "__main__":    
-    chart = ChartPosition()
-    data = calculate_parameters(2*pi, -pi/2)
-    chart.plot_chart(data, True)
+# if __name__ == "__main__":    
+#     # chart = ChartPosition()
+#     data = calculate_parameters(2*pi, -pi/2)
+#     chart.plot_chart(data, True)

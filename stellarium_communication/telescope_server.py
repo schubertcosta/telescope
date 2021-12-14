@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
  
 import logging
-from threading import Thread
 import asyncore, socket
-from time import sleep, time
+from time import time
 from bitstring import ConstBitStream
 import coords
  
@@ -13,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG, format="%(filename)s: %(funcName)s - %(
 # \brief Implementation of the server side connection for 'Stellarium Telescope Protocol'
 
 #  Manages the execution thread to the server side connection with Stellarium
-class Telescope_Channel(Thread, asyncore.dispatcher): 
+class Telescope_Channel(asyncore.dispatcher): 
     ## Class constructor
     #
     # \param conn_sock Connection socket
@@ -21,7 +20,6 @@ class Telescope_Channel(Thread, asyncore.dispatcher):
         self.is_writable = False
         self.buffer = ''
         asyncore.dispatcher.__init__(self, conn_sock)
-        Thread.__init__(self, None)
         self.queue = queue
  
     ## Indicates the socket is readable
@@ -75,7 +73,7 @@ class Telescope_Channel(Thread, asyncore.dispatcher):
             logging.debug("sra: %s, Sdec: %s, Stime: %s" % (sra, sdec, stime))
             #Sends back the coordinates to Stellarium
             self.act_pos(coords.hourStr_2_rad(sra), coords.degStr_2_rad(sdec))
-
+            
             self.queue.put([sra, sdec, stime])
 
  
@@ -119,14 +117,13 @@ class Telescope_Channel(Thread, asyncore.dispatcher):
 ## \brief Implementation of the server side communications for 'Stellarium Telescope Protocol'.
 #
 #  Each connection request generate an independent execution thread as instance of Telescope_Channel
-class Telescope_Server(Thread, asyncore.dispatcher):
+class Telescope_Server(asyncore.dispatcher):
  
     ## Class constructor
     #
     # \param port Port to listen on
     def __init__(self, queue, port=10001):
         asyncore.dispatcher.__init__(self, None)
-        Thread.__init__(self, None)
         self.tel = None
         self.port = port
         self.queue = queue

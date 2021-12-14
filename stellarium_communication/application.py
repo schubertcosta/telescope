@@ -1,4 +1,3 @@
-
 from charts.chart_angle import ChartAngle
 from charts.chart_position import ChartPosition
 from telescope_control.calculate_parameters import calculate_parameters
@@ -10,13 +9,12 @@ import time
 import stellarium_api
 import coords
 import matplotlib.pyplot as plt
-from freecad.pieces_control import start_freecad
-from freecad.pieces_control import set_position
+from freecad.pieces_control import FreeCadAnimation
 
 def stellarium_api_communication(queue):
-    doc = start_freecad()
     chart = ChartPosition()
     chart_angles = ChartAngle()
+    freecad = FreeCadAnimation()
     while True:
         queue.get()   
 
@@ -26,7 +24,7 @@ def stellarium_api_communication(queue):
         [positions, angles] = calculate_parameters(az, al)
         chart.plot_chart(positions)
         chart_angles.plot_chart(angles)
-        set_position(doc, angles)
+        freecad.set_position(angles)
 
         if queue:
             while queue.empty():
@@ -42,9 +40,9 @@ class Application():
     queue = Queue()     
     stellarium_api_thread = Thread(target=stellarium_api_communication, args=(queue,))
     stellarium_api_thread.daemon = True
+    stellarium_api_thread.start()
     stellarium_thread = Thread(target=stellarium_telescope_server, args=(queue,))
     stellarium_thread.daemon = True
-    stellarium_api_thread.start()
     stellarium_thread.start()    
     
     try:

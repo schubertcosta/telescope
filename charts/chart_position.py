@@ -21,7 +21,7 @@ class ChartPosition():
     def on_running(self, coordinates):
         color = np.random.rand(3,)
         for (x,y,z) in coordinates:
-            plt.pause(0.3)
+            # plt.pause(0.3)
             self.ax.scatter(x, y, z, color=color)
             self.draw()        
         

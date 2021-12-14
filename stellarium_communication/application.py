@@ -14,7 +14,7 @@ from freecad.pieces_control import FreeCadAnimation
 def stellarium_api_communication(queue):
     chart = ChartPosition()
     chart_angles = ChartAngle()
-    freecad = FreeCadAnimation()
+    # freecad = FreeCadAnimation()
     while True:
         queue.get()   
 
@@ -24,11 +24,11 @@ def stellarium_api_communication(queue):
         [positions, angles] = calculate_parameters(az, al)
         chart.plot_chart(positions)
         chart_angles.plot_chart(angles)
-        freecad.set_position(angles)
+        # freecad.set_position(angles)
 
-        if queue:
-            while queue.empty():
-                plt.pause(0.01)
+        # if queue:
+        #     while queue.empty():
+        #         plt.pause(0.01)
 
         queue.task_done()
 

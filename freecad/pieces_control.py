@@ -6,7 +6,6 @@ sys.path.append(constants.freecad_path)
 sys.path.insert(1, '../telescope')
 import FreeCAD as App, FreeCADGui as Gui
 import time
-
 from PySide2 import QtWidgets
 
 class FreeCadAnimation():

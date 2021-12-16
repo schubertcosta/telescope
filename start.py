@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import sys
 
 sys.path.insert(1, './stellarium_communication')

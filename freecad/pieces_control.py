@@ -1,17 +1,19 @@
 
-FREECADPATH = 'C:/Program Files/FreeCAD 0.19/bin/' # path to your FreeCAD.so or FreeCAD.dll file
 from math import pi
+import constants
 import sys
-sys.path.append(FREECADPATH)
+sys.path.append(constants.freecad_path)
 sys.path.insert(1, '../telescope')
 import FreeCAD as App, FreeCADGui as Gui
 import time
-import constants
+
+from PySide2 import QtWidgets
 
 class FreeCadAnimation():
     def __init__(self):
+        self.app=QtWidgets.QApplication(sys.argv)
         Gui.showMainWindow()
-        self.doc = App.open(constants.freecad_path)
+        self.doc = App.open(constants.freecad_mounting)
         self.adjust_view()
         Gui.updateGui()
 

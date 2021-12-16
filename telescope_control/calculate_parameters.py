@@ -3,7 +3,6 @@ from sympy import *
 import sys
 sys.path.insert(1, '../telescope')
 sys.path.insert(1, '../charts')
-# from charts.chart_position import ChartPosition
 import constants
 from numpy import pi
 
@@ -126,8 +125,3 @@ def get_best_q(qs_array, sub_params, range, q_number, last_position):
         raise ValueError("Error - q%d out of range. q_array -> %s" % (q_number, q_array))
 
     return get_faster_route(q_candidate_array, last_position)
-    
-# if __name__ == "__main__":    
-#     # chart = ChartPosition()
-#     data = calculate_parameters(2*pi, -pi/2)
-#     chart.plot_chart(data, True)

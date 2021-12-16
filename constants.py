@@ -6,7 +6,6 @@ l1 = 0.5
 l2 = 0.8
 time_for_each_moviment = 3
 steps = 15
-#zenith
 q1_limit = [-2*pi, 2*pi]
 q2_limit = [-pi/4, pi/2]
 az_limit = [0, 2*pi]
@@ -21,4 +20,6 @@ robot_structure = {
     "l1": [0, 0, Symbol('l1'), 1],
     "l2": [Symbol('l2'), 0, 0, 1]
 }
-freecad_path = "G:\\Meu Drive\\Projetos\\Telescopio\\CAD\\First version1\\monting.FCStd"
+freecad_mounting = "G:\\Meu Drive\\Projetos\\Telescopio\\CAD\\First version1\\monting.FCStd"
+freecad_path = 'C:/Program Files/FreeCAD 0.19/bin/' # path to your FreeCAD.so or FreeCAD.dll file
+stelarium_uri = "http://localhost:8090/api/"

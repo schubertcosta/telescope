@@ -2,10 +2,8 @@
 import requests
 import constants
 
-STELLARIUM_API_URL = "http://localhost:8090/api/"
-
 def get_current_position_focus():
-    request = requests.get(STELLARIUM_API_URL + "main/status?actionId=-1&propId=-2")
+    request = requests.get(constants.stelarium_uri + "main/status?actionId=-1&propId=-2")
     location = request.json()["selectioninfo"]
     
     try:            

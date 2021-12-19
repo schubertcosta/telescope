@@ -40,6 +40,15 @@ def radStr_2_deg(rad):
     if(r < 0):
         r = (2 * math.pi) - abs(r)
     
+    return rad_2_degree(r)
+    
+
+## Transforms from radians (float/int) to degrees (float)
+# (rad * 180)/pi
+#
+# \param radians in float/int format
+# \return Degrees in float format
+def rad_2_degree(r):
     return (r * 180) / math.pi
 
 ## Transforms radians from float to string format

@@ -36,6 +36,10 @@ class Application():
 
             freecad.set_position(angles)
 
+            if self.queue:
+                while self.queue.empty():
+                    freecad.free_gui()
+
             self.queue.task_done()
 
     def stellarium_telescope_server(self):

@@ -17,6 +17,7 @@ class FreeCadAnimation():
         Gui.updateGui()
 
     def set_position(self, q_list):
+        print(q_list)
         for (q1, q2) in q_list:
             time.sleep(0.5)
             self.doc.Base_rotativa.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(q1 * 180/pi,0,0), App.Vector(0,0,0))
@@ -30,6 +31,7 @@ class FreeCadAnimation():
         Gui.runCommand('Std_PerspectiveCamera',1)
         Gui.activeDocument().activeView().viewIsometric()
         Gui.ActiveDocument.ActiveView.setAxisCross(True)
+        self.set_position([constants.initial_q_position])
     
 if __name__ == '__main__':
     FreeCadAnimation()

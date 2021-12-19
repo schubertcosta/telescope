@@ -10,7 +10,7 @@ from PySide2 import QtWidgets
 
 class FreeCadAnimation():
     def __init__(self):
-        self.app=QtWidgets.QApplication(sys.argv)
+        # self.app=QtWidgets.QApplication(sys.argv)
         Gui.showMainWindow()
         self.doc = App.open(constants.freecad_mounting)
         self.adjust_view()

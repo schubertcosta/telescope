@@ -2,16 +2,16 @@ import sys
 
 sys.path.insert(1, './stellarium_communication')
 sys.path.insert(1, './telescope_control')
-from analysis import Analysis
-from application import Application
 
 def main(argv):
-    param = argv[1]
-    print(param)
+    param = argv[1] if len(argv) > 1 else None
     if(param == "-a"):
+        from analysis import Analysis
         Analysis()
     else:
+        from application import Application
         Application()
     sys.stdout.flush()      
 
-main()
+if __name__ == '__main__':
+    main(sys.argv)

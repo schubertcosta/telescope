@@ -27,8 +27,8 @@ class Analysis():
             logging.debug("\nBye!")
 
     def stellarium_api_communication(self):
-        chart_angle = ChartAngle()
-        chart_position = ChartPosition()
+        chart_angle = ChartAngle(self.queue)
+        # chart_position = ChartPosition()
         while True:
             self.queue.get()   
 
@@ -38,11 +38,7 @@ class Analysis():
             [positions, angles] = calculate_parameters(az, al)
 
             chart_angle.plot_chart(angles)
-            chart_position.plot_chart(positions)
-
-            if self.queue:
-                while self.queue.empty():
-                    plt.pause(0.01)
+            # chart_position.plot_chart(positions)
 
             self.queue.task_done()
 
@@ -50,7 +46,6 @@ class Analysis():
         test = Telescope_Server(self.queue)
         test.run()   
    
-
 # Run Threads
 if __name__ == '__main__':
     Analysis()

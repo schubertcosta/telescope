@@ -81,9 +81,9 @@ def calculate_parameters(az, al):
         q1 = get_best_q(q1s, [(Azs, next_intermediate_angle[0])], constants.q1_limit, 1, last_q_position[0])
         q2 = get_best_q(q2s, [(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1])], constants.q2_limit, 2, last_q_position[1])
 
-        q.append([q1, q2])
-        last_position = next_intermediate_angle
         last_q_position = [q1, q2]
+        q.append(last_q_position)
+        last_position = next_intermediate_angle
 
         R75 = T75_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
         last_xyz_position = R75

@@ -1,6 +1,5 @@
 import math
 import matplotlib.pyplot as plt
-import numpy as np
 
 class ChartAngle():
     def __init__(self, queue):

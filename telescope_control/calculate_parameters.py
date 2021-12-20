@@ -73,11 +73,11 @@ def calculate_parameters(az, al):
     # loop start   
     T75_radius_adapted = T75.subs([(rs, T30[0:3,3].norm())])
 
-    angles =  utils.get_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
+    [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
     positions = []
     q = []
 
-    for next_intermediate_angle in angles:
+    for next_intermediate_angle in stellarium_angles:
         q1 = get_best_q(q1s, [(Azs, next_intermediate_angle[0])], constants.q1_limit, 1, last_q_position[0])
         q2 = get_best_q(q2s, [(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1])], constants.q2_limit, 2, last_q_position[1])
 
@@ -89,7 +89,7 @@ def calculate_parameters(az, al):
         last_xyz_position = R75
         positions.append(R75)
     
-    return [positions, q]
+    return [[stellarium_angles, d_stellarium_angles, dd_stellarium_angles], [q, [[0.0,0.0]], [[0.0,0.0]]], positions]
 
 def verify_route(angle, range):
     if angle >= range[0] and angle <= range[1]:

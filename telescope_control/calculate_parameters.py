@@ -75,9 +75,10 @@ def calculate_parameters(az, al):
 
     [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
     positions = []
-    q = []
+    q, dq, ddq = [[],[],[]]
 
-    for next_intermediate_angle in stellarium_angles:
+
+    for index, next_intermediate_angle in enumerate(stellarium_angles):
         q1 = get_best_q(q1s, [(Azs, next_intermediate_angle[0])], constants.q1_limit, 1, last_q_position[0])
         q2 = get_best_q(q2s, [(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1])], constants.q2_limit, 2, last_q_position[1])
 
@@ -85,9 +86,29 @@ def calculate_parameters(az, al):
         q.append(last_q_position)
         last_position = next_intermediate_angle
 
-        R75 = T75_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
-        last_xyz_position = R75
-        positions.append(R75)
+        T75num = T75_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
+        last_xyz_position = T75num
+        positions.append(T75num)
+
+        # V = T75num*d_stellarium_angles[index,:]
+        # JLAc = 
+
+        # %Calculando as velocidades
+        # V = [T70(1:3,1:3)*matrizVelocidade(i,:)'; 0; 0; 0];
+        # JLAc = double(subs(JLAc,q,matrizPosicaoJuntas(i,:)));
+        # matrizVelocidadeJuntas(i,:) = JLAc\V;
+        
+        # %Calculando as acelera��es
+        # A = [T70(1:3,1:3)*matrizAceleracao(i,:)'; 0; 0; 0];
+        # matrizAceleracaoJuntas(i,:) = JLAc\(A - double(subs(dJLAc,[q dq'],[matrizPosicaoJuntas(i,:) matrizVelocidadeJuntas(i,:)]))*matrizVelocidadeJuntas(i,:)');
+        
+        # %Calculando os torques
+        # for p = 1:length(q)
+        #     T1(p) = double(subs(ddLdqpdt(p),[q_L' dq_L' ddq_L'],[matrizPosicaoJuntas(i,:) matrizVelocidadeJuntas(i,:) matrizAceleracaoJuntas(i,:)]));
+        #     T2(p) = -double(subs(dLdq(p),[q dq'],[matrizPosicaoJuntas(i,:) matrizVelocidadeJuntas(i,:)]));
+        #     T3(p) = double(subs(dEddqp(p),[q dq'],[matrizPosicaoJuntas(i,:) matrizVelocidadeJuntas(i,:)]));
+        # end
+        # torque(i,:) = T1+T2+T3
     
     return [[stellarium_angles, d_stellarium_angles, dd_stellarium_angles], [q, [[0.0,0.0]], [[0.0,0.0]]], positions]
 

@@ -1,62 +1,70 @@
-"""
-A simple example of an animated plot... In 3D!
-"""
+
+# FREECADPATH = 'C:/Program Files/FreeCAD 0.19/bin/' # path to your FreeCAD.so or FreeCAD.dll file
+# import sys
+# sys.path.append(FREECADPATH)
+
+
+# from PySide2 import QtCore, QtGui, QtWidgets
+# import FreeCAD as App, FreeCADGui as Gui
+
+
+# def test(app):
+#     acum = 0
+#     for i in range(20):            
+#         time.sleep(0.5)
+#         doc.Base_rotativa.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(acum + 25,0,0), App.Vector(0,0,0))
+#         doc.Tubo.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(acum + 25,acum + 10,0), App.Vector(0,0,644))
+#         doc.recompute()
+#         acum = acum + 25
+#         Gui.updateGui()
+#         # app.processEvents()
+        
+# # 
+
+# app=QtWidgets.QApplication(sys.argv)
+
+# Gui.showMainWindow()
+
+# import time
+# # doc.recompute()
+
+# doc = App.open("G:\\Meu Drive\\Projetos\\Telescopio\\CAD\\First version1\\monting.FCStd")
+# Gui.activeDocument().activeView().setCameraType("Perspective")
+# Gui.runCommand('Std_OrthographicCamera',0)
+# Gui.runCommand('Std_PerspectiveCamera',1)
+# Gui.activeDocument().activeView().viewIsometric()
+# Gui.ActiveDocument.ActiveView.setAxisCross(True)
+# test(app)
+
+# # creates a document and a Part feature with the cube
+# # Part.show(cube)
+# # app.processEvents()
+# # app.processEvents()
+# app.exec_()
+
+# import matplotlib.pyplot as plt
+# import numpy as np
+# f, axes = plt.subplots(1,2)  # 1 row containing 2 subplots.
+
+# # Plot random points on one subplots.
+# axes[0].scatter(np.random.randn(10), np.random.randn(10))
+
+# # Plot histogram on the other one.
+# axes[1].hist(np.random.randn(100))
+
+# # Adjust the size and layout through the Figure-object.
+# f.set_size_inches(10, 5)
+# f.tight_layout()
+# plt.show()
+
+
 import numpy as np
-import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d.axes3d as p3
-import matplotlib.animation as animation
 
-def Gen_RandLine(length, dims=2) :
-    """
-    Create a line using a random walk algorithm
+matrix = np.array([[2,2,2,2],[4,4,4,4],[6,6,6,6], [10,10,10,10]])
 
-    length is the number of points for the line.
-    dims is the number of dimensions the line has.
-    """
-    lineData = np.empty((dims, length))
-    lineData[:, 0] = np.random.rand(dims)
-    for index in range(1, length) :
-        # scaling the random numbers by 0.1 so
-        # movement is small compared to position.
-        # subtraction by 0.5 is to change the range to [-0.5, 0.5]
-        # to allow a line to move backwards.
-        step = ((np.random.rand(dims) - 0.5) * 0.1)
-        lineData[:, index] = lineData[:, index-1] + step
+vector = np.array([2,4,6,10])
+print(matrix)
+print(vector.reshape(4,1))
 
-    return lineData
-
-def update_lines(num, dataLines, lines) :
-    for line, data in zip(lines, dataLines) :
-        # NOTE: there is no .set_data() for 3 dim data...
-        line.set_data(data[0:2, :num])
-        line.set_3d_properties(data[2,:num])
-    return lines
-
-# Attaching 3D axis to the figure
-fig = plt.figure()
-ax = p3.Axes3D(fig)
-
-# Fifty lines of random 3-D lines
-data = [Gen_RandLine(25, 3) for index in range(50)]
-
-# Creating fifty line objects.
-# NOTE: Can't pass empty arrays into 3d version of plot()
-lines = [ax.plot(dat[0, 0:1], dat[1, 0:1], dat[2, 0:1])[0] for dat in data]
-
-# Setting the axes properties
-ax.set_xlim3d([0.0, 1.0])
-ax.set_xlabel('X')
-
-ax.set_ylim3d([0.0, 1.0])
-ax.set_ylabel('Y')
-
-ax.set_zlim3d([0.0, 1.0])
-ax.set_zlabel('Z')
-
-ax.set_title('3D Test')
-
-# Creating the Animation object
-line_ani = animation.FuncAnimation(fig, update_lines, 25, fargs=(data, lines),
-                              interval=50, blit=False)
-
-plt.show()
+aa = np.linalg.lstsq(matrix, vector.reshape(4,1))
+print(np.array(aa))

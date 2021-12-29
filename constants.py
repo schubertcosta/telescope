@@ -27,7 +27,7 @@ stelarium_uri = "http://localhost:8090/api/"
 # Parameters relate with the center of mass of the telescope
 # we are using PLA
 g0 = [0, 0, -9.80665]
-
+mi = 0.5*eye(2); # friction steel x PLA
 mass_matrix = [4.33506, 2.41293]
 
 Pg11 = Matrix([0, 0, -0.17468, 1])

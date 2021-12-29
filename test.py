@@ -60,11 +60,13 @@
 
 import numpy as np
 
-matrix = np.array([[2,2,2,2],[4,4,4,4],[6,6,6,6], [10,10,10,10]])
+# matrix = np.array([[2,2,2,2],[4,4,4,4],[6,6,6,6], [10,10,10,10]])
 
-vector = np.array([2,4,6,10])
-print(matrix)
-print(vector.reshape(4,1))
+# vector = np.array([2,4,6,10])
+# print(matrix)
+# print(vector.reshape(4,1))
 
-aa = np.linalg.lstsq(matrix, vector.reshape(4,1))
-print(np.array(aa))
+# aa = np.linalg.lstsq(matrix, vector.reshape(4,1))
+# print(np.array(aa))
+
+print(5*np.eye(3))

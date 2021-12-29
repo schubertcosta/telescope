@@ -76,6 +76,31 @@ II20 = T20[0:3,0:3]*constants.II22*(T20[0:3,0:3].T)
 
 JLA = Matrix(BlockMatrix([[JL20], [JA20]]))
 
+dJL = Matrix(BlockMatrix([(JL20[0:3,0].jacobian(qs))*dqs, (JL20[0:3,1].jacobian(qs))*dqs]))
+dJA = Matrix(BlockMatrix([(JA20[0:3,0].jacobian(qs))*dqs, (JA20[0:3,1].jacobian(qs))*dqs]))
+dJLA = Matrix(BlockMatrix([[dJL], [dJA]]))
+
+# Calculating system energy
+Pg = Matrix(BlockMatrix([Pg10, Pg20]))
+dPg = Matrix(BlockMatrix([dPg10, dPg20]))
+
+L = 0
+for i in range(2):
+    L += utils.calculate_energy(constants.mass_matrix[i], dPg[:,i], constants.II[0], Pg[:,i], constants.g0)
+
+dLdqp = utils.gradient(L, dqs)
+dLdq = utils.gradient(L, qs)
+
+dEddqp = np.matmul(constants.mi, dqs)
+
+# syms q1(t) q2(t) q3(t) q4(t) q5(t) q6(t)
+# q_L = [q1(t) q2(t) q3(t) q4(t) q5(t) q6(t)]';
+# dq_L = diff(q_L,t);
+# ddq_L = diff(dq_L,t);
+
+# ddLdqpdt = diff(subs(dLdqp,[q dq'],[q_L' dq_L']),t);
+
+quit()
 # That is the telescope last position
 last_position = constants.initial_position
 last_q_position = constants.initial_q_position
@@ -113,20 +138,26 @@ def calculate_parameters(az, al):
         V_ref_0 = np.matmul(np.array(T75num),[d_stellarium_angles[index][0], d_stellarium_angles[index][1], 0])
         V = np.array([0.0, 0.0, 0.0, V_ref_0[0], V_ref_0[1], V_ref_0[2]])
         JLAnum = np.array(JLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2)]))
-
-        dq = np.matmul((JLAnum.T), V)
-        pprint(dq)
-        quit()
-
-        # %Calculando as velocidades
-        # V = [T70(1:3,1:3)*matrizVelocidade(i,:)'; 0; 0; 0];
-        # JLAc = double(subs(JLAc,q,matrizPosicaoJuntas(i,:)));
-        # matrizVelocidadeJuntas(i,:) = JLAc\V;
+        dqnum = np.matmul((JLAnum.T), V)
+        dq.append(dqnum)
         
-        # %Calculando as acelera��es
-        # A = [T70(1:3,1:3)*matrizAceleracao(i,:)'; 0; 0; 0];
-        # matrizAceleracaoJuntas(i,:) = JLAc\(A - double(subs(dJLAc,[q dq'],[matrizPosicaoJuntas(i,:) matrizVelocidadeJuntas(i,:)]))*matrizVelocidadeJuntas(i,:)');
-        
+        # Calculating acceleration
+        A_ref_0 = np.matmul(np.array(T75num),[dd_stellarium_angles[index][0], dd_stellarium_angles[index][1], 0])
+        A = np.array([0.0, 0.0, 0.0, A_ref_0[0], A_ref_0[1], A_ref_0[2]])
+        dJLAnum = np.array(JLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]))
+        ddq_jacobian_dem = np.matmul(dJLAnum, dqnum)
+        ddq_dem = np.subtract(A, ddq_jacobian_dem)
+        ddqnum = np.matmul((dJLAnum.T), ddq_dem)
+        ddq.append(ddqnum)
+
+        # Calculating torques
+        T1, T2, T3 = [[], [], []]
+
+        # for p in range(2):
+        #     T1[p] = 
+        #     T2[p] = 
+        #     T3[p] = 
+
         # %Calculando os torques
         # for p = 1:length(q)
         #     T1(p) = double(subs(ddLdqpdt(p),[q_L' dq_L' ddq_L'],[matrizPosicaoJuntas(i,:) matrizVelocidadeJuntas(i,:) matrizAceleracaoJuntas(i,:)]));
@@ -134,8 +165,7 @@ def calculate_parameters(az, al):
         #     T3(p) = double(subs(dEddqp(p),[q dq'],[matrizPosicaoJuntas(i,:) matrizVelocidadeJuntas(i,:)]));
         # end
         # torque(i,:) = T1+T2+T3
-    
-    return [[stellarium_angles, d_stellarium_angles, dd_stellarium_angles], [q, [[0.0,0.0]], [[0.0,0.0]]], positions]
+    return [[stellarium_angles, d_stellarium_angles, dd_stellarium_angles], [q, dq, ddq], positions]
 
 def verify_route(angle, range):
     if angle >= range[0] and angle <= range[1]:

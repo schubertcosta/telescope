@@ -20,6 +20,6 @@ class ChartAngle(ChartBase):
             q2_array = [math.degrees(coordinate[1]) for coordinate in coordinates]
             last_x = self.get_last_x_value(self.axs[0])
             x = [data for data in range(last_x, last_x + len(q1_array))]
-            self.axs[index].plot(x, q1_array, c="red")
-            self.axs[index].plot(x, q2_array, c="blue")
+            self.axs[index].plot(x, q1_array, c="red", label="1")
+            self.axs[index].plot(x, q2_array, c="blue", label="2")
             self.draw() 

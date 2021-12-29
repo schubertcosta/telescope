@@ -93,14 +93,13 @@ dLdq = utils.gradient(L, qs)
 
 dEddqp = np.matmul(constants.mi, dqs)
 
-# syms q1(t) q2(t) q3(t) q4(t) q5(t) q6(t)
-# q_L = [q1(t) q2(t) q3(t) q4(t) q5(t) q6(t)]';
-# dq_L = diff(q_L,t);
-# ddq_L = diff(dq_L,t);
+t = symbols('t')
+q_L = [Function(qs[0])(t), Function(qs[1])(t)]
+dq_L = [diff(q_L[0], qs, t), diff(q_L[1], qs, t)]
+ddq_L = [diff(dq_L[0], qs, t), diff(dq_L[1], qs, t)]
 
-# ddLdqpdt = diff(subs(dLdqp,[q dq'],[q_L' dq_L']),t);
+ddLdqpdt = diff(Matrix(dLdqp).subs([(qs[0], q_L[0]), (qs[1], q_L[1]), (dqs[0], dq_L[0]), (dqs[1], dq_L[1])]), t)
 
-quit()
 # That is the telescope last position
 last_position = constants.initial_position
 last_q_position = constants.initial_q_position
@@ -151,12 +150,14 @@ def calculate_parameters(az, al):
         ddq.append(ddqnum)
 
         # Calculating torques
-        T1, T2, T3 = [[], [], []]
+        torque = []
+        T1 = Matrix(ddLdqpdt).subs([(l1s, constants.l1), (l2s, constants.l2), (q_L[0], q1), (q_L[1], q2), (dq_L[0], dqnum[0]), (dq_L[1], dqnum[1]), (ddq_L[0], ddqnum[0]), (ddq_L[1], ddqnum[1])])
+        T2 = Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
+        T3 = Matrix(dEddqp).subs([(qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
+        torque.append(T1 + T2 + T3)
 
-        # for p in range(2):
-        #     T1[p] = 
-        #     T2[p] = 
-        #     T3[p] = 
+        pprint(torque)
+        quit()
 
         # %Calculando os torques
         # for p = 1:length(q)

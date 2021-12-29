@@ -27,7 +27,7 @@ class Analysis():
             logging.debug("\nBye!")
 
     def stellarium_api_communication(self):
-        chart_angle = ChartAngle(self.queue, ["Telescope angles - q1/q2", "Telescope velocity - dq1/dq2", "Telescope aceleration - ddq1/ddq2"])
+        # chart_angle = ChartAngle(self.queue, ["Telescope angles - q1/q2", "Telescope velocity - dq1/dq2", "Telescope aceleration - ddq1/ddq2"])
         # chart_stellarium = ChartAngle(self.queue, ["Stellarium angles - Al/Az", "Stellarium velocity - Al/Az", "Stellarium aceleration - Al/Az"])
         # chart_position = ChartPosition(self.queue)
         while True:
@@ -38,7 +38,7 @@ class Analysis():
             
             [stelarium_coordinates, telescope_coordinates, positions] = calculate_parameters(az, al)
 
-            chart_angle.plot_chart(telescope_coordinates)
+            # chart_angle.plot_chart(telescope_coordinates)
             # chart_stellarium.plot_chart(stelarium_coordinates)
             # chart_position.plot_chart(positions)
 

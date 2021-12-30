@@ -6,6 +6,7 @@ sys.path.insert(1, '../charts')
 import constants
 import numpy as np
 from numpy import pi
+from sympy.vector import gradient
 
 # Calculating Transformations for the robot
 robot  = constants.robot_structure
@@ -60,13 +61,14 @@ q2s = [asin((-E + sqrt(E**2 - 4*D))/2),  asin((-E - sqrt(E**2 - 4*D))/2)]
 # Cinematic and Dinamic parameters
 Pg10 = T10*constants.Pg11
 JL10 = Pg10[0:3,0].jacobian(qs)
-JA10 = Matrix(BlockMatrix([T10[0:3,3], Matrix(np.zeros((3,1)))]))
+JA10 = Matrix(BlockMatrix([T10[0:3,2], Matrix(np.zeros((3,1)))]))
 dPg10 = Matrix([JL10, JA10])*dqs
 II10 = T10[0:3,0:3]*constants.II11*(T10[0:3,0:3].T)
 
 Pg20 = T20*constants.Pg22
 JL20 = Pg20[0:3,0].jacobian(qs)
-JA20 = Matrix(BlockMatrix([T10[0:3,3], T20[0:3,2]]))
+JA20 = Matrix(BlockMatrix([T10[0:3,2], T20[0:3,1]]))
+# JA20 = Matrix(BlockMatrix([T10[0:3,2], T30[0:3,1]]))
 dPg20 = Matrix([JL20, JA20])*dqs
 II20 = T20[0:3,0:3]*constants.II22*(T20[0:3,0:3].T)
 
@@ -86,6 +88,10 @@ for i in range(2):
 
 dLdqp = utils.gradient(L, dqs)
 dLdq = utils.gradient(L, qs)
+
+# pprint([constants.mass_matrix[0], dPg[0], constants.II[0], Pg[0], constants.g0])
+# pprint(dLdq[0].subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], pi), (qs[1], pi), (dqs[0], pi), (dqs[1], pi)]))
+
 dEddqp = np.matmul(constants.mi, dqs)
 
 t = symbols('t')
@@ -111,7 +117,6 @@ def calculate_parameters(az, al):
     # loop start   
     T75_radius_adapted = T75.subs([(rs, T30[0:3,3].norm())])
 
-    # [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
     [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_fifth_order_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
     positions = []
     q, dq, ddq, torque = [[],[],[], []]
@@ -144,18 +149,18 @@ def calculate_parameters(az, al):
         ddq.append(ddqnum)
 
         # Calculating torques
-        T1 = ddLdqpdt \
-            .subs([(ddq_L[0], ddqnum[0]), (ddq_L[1], ddqnum[1])]) \
-            .subs([(dq_L[0], dqnum[0]), (dq_L[1], dqnum[1])]) \
-            .subs([(q_L[0], q1), (q_L[1], q2), (l1s, constants.l1), (l2s, constants.l2)])
-        T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
-        T3 = Matrix(dEddqp).subs([(qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
-
-        TN = T1 + T2 + T3        
-        torque.append(TN.T)
-
+        # T1 = ddLdqpdt \
+        #     .subs([(ddq_L[0], ddqnum[0]), (ddq_L[1], ddqnum[1])]) \
+        #     .subs([(dq_L[0], dqnum[0]), (dq_L[1], dqnum[1])]) \
+        #     .subs([(q_L[0], q1), (q_L[1], q2), (l1s, constants.l1), (l2s, constants.l2)])
         # T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
-        # pprint(T2)
+        # T3 = Matrix(dEddqp).subs([(qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
+
+        # TN = T1 + T2 + T3        
+        # torque.append(TN.T)
+
+        T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
+        pprint(T2[0])
     
     # quit()
     return [[stellarium_angles, d_stellarium_angles, dd_stellarium_angles], [q, dq, ddq, torque], positions]

@@ -4,7 +4,7 @@ from sympy.core.symbol import Symbol
 
 l1 = 0.5
 l2 = 0.8
-time_for_each_moviment = 3
+time_for_each_moviment = 5
 steps = 15
 q1_limit = [-2*pi, 2*pi]
 q2_limit = [-pi/4, pi/2]
@@ -31,7 +31,7 @@ mi = 0.5*eye(2); # friction steel x PLA
 mass_matrix = [4.33506, 2.41293]
 
 Pg11 = Matrix([0, 0, -0.17468, 1])
-II11 = Matrix([[0.19413, 0, 0], [0, 0.016470, 0], [0, 0, 0.05770]])
+II11 = Matrix([[0.19413, 0, 0], [0, 0.16470, 0], [0, 0, 0.05770]])
 
 Pg22 = Matrix([-0.06774, 0, 0, 1])
 II22 = Matrix([[0.01757, 0, 0], [0, 0.06109, 0], [0, 0, 0.06803]])

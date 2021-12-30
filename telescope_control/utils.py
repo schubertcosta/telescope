@@ -1,5 +1,6 @@
 from sympy import *
 import numpy as np
+from sympy.solvers.diophantine.diophantine import PQa
 
 def rotate_matrix(axis, q):
     switcher = {
@@ -43,10 +44,32 @@ def get_parametrization(previous_position, next_position, time_for_each_moviment
         dd_position.append(2*k2 + 6*k3*t)
     return position, d_position, dd_position
 
+def get_fifth_order_parametrization(P1, P2, time_for_each_moviment, steps, V1 = 0, V2 = 0, modulo_aceleracao = 0.1 ):
+    A1 = np.array([modulo_aceleracao, 0])
+    A2 = np.array([-modulo_aceleracao, 0])
+    P1 = np.array(P1)
+    P2 = np.array(P2)
+    position = []
+    d_position = []
+    dd_position = []
+
+    for t in np.linspace(0, time_for_each_moviment, num = steps, endpoint=False):
+        k0 = P1
+        k1 = V1
+        k2 = A1/2
+        k3 = (20*P2-20*P1-(8*V2+12*V1)*time_for_each_moviment-(3*A1-A2)*time_for_each_moviment**2)/(2*time_for_each_moviment**3)
+        k4 = (30*P1-30*P2+(14*V2+16*V1)*time_for_each_moviment+(3*A1-2*A2)*time_for_each_moviment**2)/(2*time_for_each_moviment**4)
+        k5 = (12*P2-12*P1-(6*V2+6*V1)*time_for_each_moviment-(A1-A2)*time_for_each_moviment**2)/(2*time_for_each_moviment**5)
+        position.append(k0 + k1*t + k2*t**2 + k3*t**3 + k4*t**4 + k5*t**5)
+        d_position.append(k1 + 2*k2*t + 3*k3*t**2 + 4*k4*t**3 + 5*k5*t**4)
+        dd_position.append(2*k2 + 6*k3*t + 12*k4*t**2 + 20*k5*t**3)
+
+    return position, d_position, dd_position
+
 def calculate_energy(m, dPg, II, Pg, g):
     dPg_03_arr = np.array(dPg[0:3])
     dPg_36_arr = np.array(dPg[3:6])
-    knetic_energy = 0.5*m*np.matmul(dPg_03_arr.T, dPg_03_arr) + 0.5*np.matmul(dPg_36_arr.T, np.matmul(II, dPg_36_arr))
+    knetic_energy = 0.5*m*np.matmul(dPg_03_arr.T, dPg_03_arr) + 0.5*m*np.matmul(dPg_36_arr.T, np.matmul(II, dPg_36_arr))
     potential_energy = -m*np.matmul(np.array(g).T, np.array(Pg[0:3]))
     return knetic_energy - potential_energy
 

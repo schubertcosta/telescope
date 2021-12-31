@@ -6,7 +6,6 @@ sys.path.insert(1, '../charts')
 import constants
 import numpy as np
 from numpy import pi
-from sympy.vector import gradient
 
 # Calculating Transformations for the robot
 robot  = constants.robot_structure
@@ -67,10 +66,9 @@ II10 = T10[0:3,0:3]*constants.II11*(T10[0:3,0:3].T)
 
 Pg20 = T20*constants.Pg22
 JL20 = Pg20[0:3,0].jacobian(qs)
-JA20 = Matrix(BlockMatrix([T10[0:3,2], T20[0:3,1]]))
-# JA20 = Matrix(BlockMatrix([T10[0:3,2], T30[0:3,1]]))
+JA20 = Matrix(BlockMatrix([T10[0:3,2], T30[0:3,1]]))
 dPg20 = Matrix([JL20, JA20])*dqs
-II20 = T20[0:3,0:3]*constants.II22*(T20[0:3,0:3].T)
+II20 = T30[0:3,0:3]*constants.II22*(T30[0:3,0:3].T)
 
 JLA = Matrix(BlockMatrix([[JL20], [JA20]]))
 
@@ -81,16 +79,14 @@ dJLA = Matrix(BlockMatrix([[dJL], [dJA]]))
 # Calculating system energy
 Pg = [Pg10, Pg20]
 dPg = [dPg10, dPg20]
+II = [II10, II20]
 
 L = 0
 for i in range(2):
-    L += utils.calculate_energy(constants.mass_matrix[i], dPg[i], constants.II[i], Pg[i], constants.g0)
+    L += utils.calculate_energy(constants.mass_matrix[i], dPg[i], II[i], Pg[i], constants.g0)
 
 dLdqp = utils.gradient(L, dqs)
 dLdq = utils.gradient(L, qs)
-
-# pprint([constants.mass_matrix[0], dPg[0], constants.II[0], Pg[0], constants.g0])
-# pprint(dLdq[0].subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], pi), (qs[1], pi), (dqs[0], pi), (dqs[1], pi)]))
 
 dEddqp = np.matmul(constants.mi, dqs)
 
@@ -114,6 +110,9 @@ def calculate_parameters(az, al):
         return [last_xyz_position]
     (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]    
 
+    # az = 2*pi
+    # al = 2*pi
+
     # loop start   
     T75_radius_adapted = T75.subs([(rs, T30[0:3,3].norm())])
 
@@ -134,14 +133,14 @@ def calculate_parameters(az, al):
         positions.append(last_xyz_position)
 
         ## Calculating velocity
-        V_ref_0 = np.matmul(np.array(T75num),[d_stellarium_angles[index][0], d_stellarium_angles[index][1], 0])
+        V_ref_0 = [0, d_stellarium_angles[index][1], d_stellarium_angles[index][0]]
         V = np.array([0.0, 0.0, 0.0, V_ref_0[0], V_ref_0[1], V_ref_0[2]])
         JLAnum = np.array(JLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2)]))
         dqnum = np.matmul((JLAnum.T), V)
         dq.append(dqnum)
         
         # Calculating acceleration
-        A_ref_0 = np.matmul(np.array(T75num),[dd_stellarium_angles[index][0], dd_stellarium_angles[index][1], 0])
+        A_ref_0 = [0, dd_stellarium_angles[index][1], dd_stellarium_angles[index][0]]
         A = np.array([0.0, 0.0, 0.0, A_ref_0[0], A_ref_0[1], A_ref_0[2]])
         dJLAnum = np.array(dJLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]))
         ddq_dem = np.subtract(A, np.matmul(dJLAnum, dqnum))
@@ -149,20 +148,21 @@ def calculate_parameters(az, al):
         ddq.append(ddqnum)
 
         # Calculating torques
-        # T1 = ddLdqpdt \
-        #     .subs([(ddq_L[0], ddqnum[0]), (ddq_L[1], ddqnum[1])]) \
-        #     .subs([(dq_L[0], dqnum[0]), (dq_L[1], dqnum[1])]) \
-        #     .subs([(q_L[0], q1), (q_L[1], q2), (l1s, constants.l1), (l2s, constants.l2)])
-        # T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
-        # T3 = Matrix(dEddqp).subs([(qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
+        T1 = ddLdqpdt \
+            .subs([(ddq_L[0], ddqnum[0]), (ddq_L[1], ddqnum[1])]) \
+            .subs([(dq_L[0], dqnum[0]), (dq_L[1], dqnum[1])]) \
+            .subs([(q_L[0], q1), (q_L[1], q2), (l1s, constants.l1), (l2s, constants.l2)]) \
+            .subs([(qs[0], q1), (qs[1], q2)]) \
+            .subs([(Als, next_intermediate_angle[1])])
+        T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]) \
+            .subs([(Als, next_intermediate_angle[1])])
+        T3 = Matrix(dEddqp).subs([(qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]) \
+            .subs([(Als, next_intermediate_angle[1])])
 
-        # TN = T1 + T2 + T3        
-        # torque.append(TN.T)
+        TN = T1 + T2 + T3   
 
-        T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
-        pprint(T2[0])
-    
-    # quit()
+        torque.append(TN.T)
+
     return [[stellarium_angles, d_stellarium_angles, dd_stellarium_angles], [q, dq, ddq, torque], positions]
 
 def verify_route(angle, range):

@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "./stellarium_communication"
+        "./stellarium_communication",
+        "./telescope_control"
     ]
 }

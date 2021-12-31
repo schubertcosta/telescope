@@ -1,72 +1,147 @@
 
-# FREECADPATH = 'C:/Program Files/FreeCAD 0.19/bin/' # path to your FreeCAD.so or FreeCAD.dll file
-# import sys
-# sys.path.append(FREECADPATH)
-
-
-# from PySide2 import QtCore, QtGui, QtWidgets
-# import FreeCAD as App, FreeCADGui as Gui
-
-
-# def test(app):
-#     acum = 0
-#     for i in range(20):            
-#         time.sleep(0.5)
-#         doc.Base_rotativa.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(acum + 25,0,0), App.Vector(0,0,0))
-#         doc.Tubo.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(acum + 25,acum + 10,0), App.Vector(0,0,644))
-#         doc.recompute()
-#         acum = acum + 25
-#         Gui.updateGui()
-#         # app.processEvents()
-        
-# # 
-
-# app=QtWidgets.QApplication(sys.argv)
-
-# Gui.showMainWindow()
-
-# import time
-# # doc.recompute()
-
-# doc = App.open("G:\\Meu Drive\\Projetos\\Telescopio\\CAD\\First version1\\monting.FCStd")
-# Gui.activeDocument().activeView().setCameraType("Perspective")
-# Gui.runCommand('Std_OrthographicCamera',0)
-# Gui.runCommand('Std_PerspectiveCamera',1)
-# Gui.activeDocument().activeView().viewIsometric()
-# Gui.ActiveDocument.ActiveView.setAxisCross(True)
-# test(app)
-
-# # creates a document and a Part feature with the cube
-# # Part.show(cube)
-# # app.processEvents()
-# # app.processEvents()
-# app.exec_()
-
-# import matplotlib.pyplot as plt
-# import numpy as np
-# f, axes = plt.subplots(1,2)  # 1 row containing 2 subplots.
-
-# # Plot random points on one subplots.
-# axes[0].scatter(np.random.randn(10), np.random.randn(10))
-
-# # Plot histogram on the other one.
-# axes[1].hist(np.random.randn(100))
-
-# # Adjust the size and layout through the Figure-object.
-# f.set_size_inches(10, 5)
-# f.tight_layout()
-# plt.show()
-
-
+from sympy import *
+import sys
+sys.path.insert(1, '../telescope')
+sys.path.insert(1, '../charts')
+sys.path.insert(1, './telescope_control')
+import utils
+import constants
 import numpy as np
+from numpy import pi
+from sympy.vector import gradient
 
-# matrix = np.array([[2,2,2,2],[4,4,4,4],[6,6,6,6], [10,10,10,10]])
+# Calculating Transformations for the robot
+robot  = constants.robot_structure
+Azs = Symbol('Az')
 
-# vector = np.array([2,4,6,10])
-# print(matrix)
-# print(vector.reshape(4,1))
+qs = symbols('q1:3')
+dqs = Matrix(symbols('dq1:3'))
+R10 = utils.rotate_matrix('z', qs[0])
+D10 = utils.position_matrix(robot["l1"])
+T10 = R10*D10
 
-# aa = np.linalg.lstsq(matrix, vector.reshape(4,1))
-# print(np.array(aa))
+# # Calculating equation for q1 and q2
+l1s = robot["l1"][2]
 
-print(5*np.eye(3))
+q1s = [Azs]
+
+# Cinematic and Dinamic parameters
+Pg10 = T10*constants.Pg11
+JL10 = Pg10[0:3,0].jacobian([qs[0]])
+JA10 = T10[0:3,2]
+dPg10 = Matrix([JL10, JA10])*dqs[0]
+
+II10 = T10[0:3,0:3]*constants.II11*(T10[0:3,0:3].T)
+
+JLA = Matrix(BlockMatrix([[JL10], [JA10]]))
+
+# pprint(JLA)
+dJL = (JL10[0:3,0].jacobian([qs[0]]))*dqs[0]
+dJA = (JA10[0:3,0].jacobian([qs[0]]))*dqs[0]
+dJLA = Matrix(BlockMatrix([[dJL], [dJA]]))
+
+
+# # Calculating system energy
+# Pg = [Pg10, Pg20]
+# dPg = [dPg10, dPg20]
+
+# pprint([constants.mass_matrix[0], dPg10, II10, Pg10, constants.g0])
+
+L = 0
+L += utils.calculate_energy(constants.mass_matrix[0], dPg10, II10, Pg10, constants.g0)
+dLdqp = utils.gradient(L, [dqs[0]])
+dLdq = utils.gradient(L, [qs[0]])
+
+dEddqp = 0.5*dqs[0]
+
+t = symbols('t')
+q_L = Function(qs[0])(t)
+dq_L = diff(q_L, t)
+ddq_L = diff(dq_L, t)
+ddLdqpdt = diff(Matrix(dLdqp).subs([(qs[0], q_L),(dqs[0], dq_L)]), t)
+
+# pprint(ddLdqpdt.subs([(ddq_L, 1)]))
+# quit()
+# That is the telescope last position
+last_position = constants.initial_position
+last_q_position = constants.initial_q_position
+last_xyz_position = constants.initial_xyz_position
+
+def calculate_parameters(az):
+
+    [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_fifth_order_parametrization(0, az, constants.time_for_each_moviment, constants.steps)
+#     positions = []
+    q, dq, ddq, torque = [[],[],[], []]
+
+    for index, next_intermediate_angle in enumerate(stellarium_angles):
+        q1 = next_intermediate_angle
+        q.append(q1)
+        
+        ## Calculating velocity
+        V_ref_0 = [0, 0, d_stellarium_angles[index][0]]
+        V = np.array([0.0, 0.0, 0.0, V_ref_0[0], V_ref_0[1], V_ref_0[2]])
+        JLAnum = np.array(JLA.subs([(l1s, constants.l1), (qs[0], q1)]))
+        dqnum = np.matmul((JLAnum.T), V)
+        dq.append(dqnum)
+        
+        # # Calculating acceleration
+        # A_ref_0 = [0, 0, dd_stellarium_angles[index][0]]
+        # A = np.array([0.0, 0.0, 0.0, A_ref_0[0], A_ref_0[1], A_ref_0[2]])
+        # dJLAnum = dJLA
+        # ddq_dem = np.subtract(A, np.matmul(dJLAnum, dqnum))
+        # ddqnum = np.matmul((JLAnum.T), ddq_dem)
+        # ddq.append(ddqnum)
+
+        # # Calculating torques
+        # T1 = ddLdqpdt.subs([(ddq_L, ddqnum[0])])
+        T2 = -Matrix(dLdq).subs([(qs[0], q1), (dqs[0], dqnum[0])])
+        # T3 = Matrix([dEddqp]).subs([(dqs[0], dqnum[0])])
+
+        pprint(T2)
+        # TN =      
+        # torque.append(TN)
+
+#         T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (qs[0], q1), (dqs[0], dqnum[0])])
+#         pprint(T2[0])
+    
+    # pprint(ddq)
+    quit()
+#     return [[stellarium_angles, d_stellarium_angles, dd_stellarium_angles], [q, dq, ddq, torque], positions]
+
+def verify_route(angle, range):
+    if angle >= range[0] and angle <= range[1]:
+        return True
+    return False
+
+def get_faster_route(angles, last_position):
+    min = 2*pi
+    shortest_angle = last_position
+    for current_angle in angles:
+        if abs(current_angle-last_position) <= min:
+            min = abs(current_angle-last_position)
+            shortest_angle = current_angle
+    return shortest_angle
+
+def get_best_q(qs_array, sub_params, range, q_number, last_position):
+    q_array = [qs.subs(sub_params) for qs in qs_array]
+    q_candidate_array = []
+
+    for q in q_array:
+        if im(q) >= constants.max_tolerated_imaginary:
+            print("q%d contains a complex number, q%d = %s" % (q_number, q_number, q))
+            continue
+
+        if im(q):
+            q = re(q)
+        
+        if q >= range[0] and q <= range[1]:
+            q_candidate_array.append(q)
+    
+    if len(q_candidate_array) == 0:
+        print("All candidates for q%d are out of range" % (q_number))
+        raise ValueError("Error - q%d out of range. q_array -> %s" % (q_number, q_array))
+
+    return get_faster_route(q_candidate_array, last_position) 
+
+if __name__ == '__main__':
+    calculate_parameters(2*pi)

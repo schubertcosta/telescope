@@ -6,15 +6,17 @@ import matplotlib.pyplot as plt
 class ChartPosition(ChartBase):
     def __init__(self, queue):
         plt.ion()
+        module_lim = constants.l2*2
         self.current_queue = queue
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(projection='3d')
-        self.ax.set_xlim3d(-constants.l2*1.2, constants.l2*1.2)
-        self.ax.set_ylim3d(-constants.l2*1.2, constants.l2*1.2)
-        self.ax.set_zlim3d(0, constants.l1 + constants.l2)
+        self.ax.set_xlim3d(-module_lim, module_lim)
+        self.ax.set_ylim3d(-module_lim, module_lim)
+        self.ax.set_zlim3d(0, module_lim + constants.l1)
         self.set_quiver()        
+        self.on_running([[0, 0, t] for t in np.linspace(0, constants.l1, num=10)])
+        self.on_running([[t, 0, constants.l1] for t in np.linspace(0, constants.l2,num=10)])
         self.draw()
-        self.set_loop()
     
     def set_quiver(self):
         x, y, z = np.array([[0,0,0],[0,0,0],[0,0,0]])

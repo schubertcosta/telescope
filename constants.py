@@ -2,15 +2,15 @@ from sympy import *
 from numpy import pi
 from sympy.core.symbol import Symbol
 
-l1 = 0.5
-l2 = 0.8
-time_for_each_moviment = 3
+l1 = 0.226
+l2 = 0.329
+time_for_each_moviment = 12
 steps = 15
 q1_limit = [-2*pi, 2*pi]
 q2_limit = [-pi/4, pi/2]
 az_limit = [0, 2*pi]
 al_limit = [0, pi]
-initial_position = [0.0, atan(l1/l2)]
+initial_position = [0.0, atan(l2/l1)]
 initial_q_position = [0, 0]
 initial_xyz_position = [l2, 0, l1]
 max_tolerated_imaginary = 0.00001
@@ -33,5 +33,9 @@ mass_matrix = [4.33506, 2.41293]
 Pg11 = Matrix([0, 0, -0.17468, 1])
 II11 = Matrix([[0.19413, 0, 0], [0, 0.16470, 0], [0, 0, 0.05770]])
 
-Pg22 = Matrix([-0.06774, 0, 0, 1])
-II22 = Matrix([[0.01757, 0, 0], [0, 0.06109, 0], [0, 0, 0.06803]])
+# Pg22 = Matrix([-0.06774, 0, 0, 1])
+# II22 = Matrix([[0.01757, 0, 0], [0, 0.06109, 0], [0, 0, 0.06803]])
+
+# manually inputed center of mass
+Pg22 = Matrix([-0.22, 0, 0, 1])
+II22 = Matrix([[0.01757, 0, 0], [0, 0.16681, 0], [0, 0, 0.17374]])

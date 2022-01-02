@@ -1,6 +1,5 @@
 from sympy import *
 import numpy as np
-import math
 
 def rotate_matrix(axis, q):
     switcher = {

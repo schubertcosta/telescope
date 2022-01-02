@@ -32,9 +32,9 @@ class Application():
             (azs, als) = stellarium_api.get_current_position_focus()
             (az, al) = coords.degStr_2_rad(azs), coords.degStr_2_rad(als)
 
-            [positions, angles] = calculate_parameters(az, al)
+            [stelarium_coordinates, telescope_coordinates, positions] = calculate_parameters(az, al, True)
 
-            freecad.set_position(angles)
+            freecad.set_position(telescope_coordinates[0])
 
             if self.queue:
                 while self.queue.empty():

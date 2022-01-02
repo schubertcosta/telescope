@@ -20,7 +20,7 @@ robot_structure = {
     "l1": [0, 0, Symbol('l1'), 1],
     "l2": [Symbol('l2'), 0, 0, 1]
 }
-freecad_mounting = "G:\\Meu Drive\\Projetos\\Telescopio\\CAD\\First version1\\monting.FCStd"
+freecad_mounting = "C:\\telescope\\CAD\\v1\\mounting.FCStd"
 freecad_path = 'C:/Program Files/FreeCAD 0.19/bin/' # path to your FreeCAD.so or FreeCAD.dll file
 stelarium_uri = "http://localhost:8090/api/"
 
@@ -33,9 +33,9 @@ mass_matrix = [4.33506, 2.41293]
 Pg11 = Matrix([0, 0, -0.17468, 1])
 II11 = Matrix([[0.19413, 0, 0], [0, 0.16470, 0], [0, 0, 0.05770]])
 
-# Pg22 = Matrix([-0.06774, 0, 0, 1])
-# II22 = Matrix([[0.01757, 0, 0], [0, 0.06109, 0], [0, 0, 0.06803]])
+Pg22 = Matrix([-0.06774, 0, 0, 1])
+II22 = Matrix([[0.01757, 0, 0], [0, 0.06109, 0], [0, 0, 0.06803]])
 
 # manually inputed center of mass
-Pg22 = Matrix([-0.22, 0, 0, 1])
-II22 = Matrix([[0.01757, 0, 0], [0, 0.16681, 0], [0, 0, 0.17374]])
+# Pg22 = Matrix([-0.22, 0, 0, 1])
+# II22 = Matrix([[0.01757, 0, 0], [0, 0.16681, 0], [0, 0, 0.17374]])

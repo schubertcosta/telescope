@@ -1,3 +1,4 @@
+import logging
 import constants
 from coords import rad_2_degree 
 import sys
@@ -18,15 +19,14 @@ class FreeCadAnimation():
     def set_position(self, q_list):
         for (q1, q2) in q_list:            
             time.sleep(0.3)
-            q1_degree = rad_2_degree(q1)
-            q2_degree = rad_2_degree(q2)
-            self.doc.Base_rotativa.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(q1_degree,0,0), App.Vector(0,0,0))
-            self.doc.Tubo.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(q1_degree, q2_degree,0), App.Vector(0,0,644))
+            self.doc.base.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(q1,0,0), App.Vector(0,0,0))
+            self.doc.Corpo_telescopio_114mm_2.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(q1, -q2,0), App.Vector(0,0,constants.l1 * 1000))
             self.doc.recompute()
             Gui.updateGui()
 
     def adjust_view(self):
         Gui.SendMsgToActiveView("ViewFit")
+        Gui.ActiveDocument.ActiveView.setAxisCross(True)
         self.set_position([constants.initial_q_position])
 
     def free_gui(self):

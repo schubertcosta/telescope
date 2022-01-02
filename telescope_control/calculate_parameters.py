@@ -99,11 +99,11 @@ ddLdqpdt = diff(Matrix(dLdqp).subs([(qs[0], q_L[0]), (qs[1], q_L[1]), (dqs[0], d
 last_position = constants.initial_position
 last_q_position = constants.initial_q_position
 last_xyz_position = constants.initial_xyz_position
+  
+        
+to_degrees = np.vectorize(math.degrees, otypes=[list])
 
-to_vector = np.vectorize(math.degrees)
-    
-
-def calculate_parameters(az, al):
+def calculate_parameters(az, al, is_live_mode = False):
     global last_position
     global last_q_position
     global last_xyz_position
@@ -123,36 +123,37 @@ def calculate_parameters(az, al):
         last_q_position = [q1, q2]
         q.append(last_q_position)
         last_position = next_intermediate_angle
-
-        last_xyz_position = T20_T_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
-        positions.append(last_xyz_position)
-
-        ## Calculating velocity
-        V = np.array([0.0, 0.0, 0.0, 0, d_stellarium_angles[index][1], d_stellarium_angles[index][0]])
-        JLAnum = np.array(JLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2)]))
-        dqnum = np.matmul((JLAnum.T), V)
-        dq.append(dqnum)
         
-        # Calculating acceleration
-        A = np.array([0.0, 0.0, 0, 0, dd_stellarium_angles[index][1], dd_stellarium_angles[index][0]])
-        dJLAnum = np.array(dJLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]))
-        ddq_dem = A - np.matmul(dJLAnum, dqnum)
-        ddqnum = np.matmul((JLAnum.T), ddq_dem)
-        ddq.append(ddqnum)
+        if is_live_mode == False:
+            last_xyz_position = T20_T_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
+            positions.append(last_xyz_position)
 
-        # Calculating torques
-        T1 = ddLdqpdt \
-            .subs([(ddq_L[0], ddqnum[0]), (ddq_L[1], ddqnum[1])]) \
-            .subs([(dq_L[0], dqnum[0]), (dq_L[1], dqnum[1])]) \
-            .subs([(q_L[0], q1), (q_L[1], q2), (l1s, constants.l1), (l2s, constants.l2)]) \
-            .subs([(qs[0], q1), (qs[1], q2)]) 
-        T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]) 
-        T3 = Matrix(dEddqp).subs([(qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
-        TN = T1 + T2 + T3   
+            ## Calculating velocity
+            V = np.array([0.0, 0.0, 0.0, 0, d_stellarium_angles[index][1], d_stellarium_angles[index][0]])
+            JLAnum = np.array(JLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2)]))
+            dqnum = np.matmul((JLAnum.T), V)
+            dq.append(dqnum)
+            
+            # Calculating acceleration
+            A = np.array([0.0, 0.0, 0, 0, dd_stellarium_angles[index][1], dd_stellarium_angles[index][0]])
+            dJLAnum = np.array(dJLA.subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]))
+            ddq_dem = A - np.matmul(dJLAnum, dqnum)
+            ddqnum = np.matmul((JLAnum.T), ddq_dem)
+            ddq.append(ddqnum)
 
-        torque.append(TN.T)
+            # Calculating torques
+            T1 = ddLdqpdt \
+                .subs([(ddq_L[0], ddqnum[0]), (ddq_L[1], ddqnum[1])]) \
+                .subs([(dq_L[0], dqnum[0]), (dq_L[1], dqnum[1])]) \
+                .subs([(q_L[0], q1), (q_L[1], q2), (l1s, constants.l1), (l2s, constants.l2)]) \
+                .subs([(qs[0], q1), (qs[1], q2)]) 
+            T2 = -Matrix(dLdq).subs([(l1s, constants.l1), (l2s, constants.l2), (qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])]) 
+            T3 = Matrix(dEddqp).subs([(qs[0], q1), (qs[1], q2), (dqs[0], dqnum[0]), (dqs[1], dqnum[1])])
+            TN = T1 + T2 + T3   
+
+            torque.append(TN.T)
         
-    return [[to_vector(stellarium_angles), to_vector(d_stellarium_angles), to_vector(dd_stellarium_angles), []], [to_vector(q), to_vector(dq), to_vector(ddq), torque], positions]
+    return [[to_degrees(stellarium_angles), to_degrees(d_stellarium_angles), to_degrees(dd_stellarium_angles), []], [to_degrees(q), to_degrees(dq), to_degrees(ddq), torque], positions]
 
 def verify_route(angle, range):
     if angle >= range[0] and angle <= range[1]:

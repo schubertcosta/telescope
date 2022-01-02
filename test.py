@@ -167,3 +167,7 @@ T31 = T21*T32
 pprint(T31.subs([(Als, qs[1])]))
 
 pprint(T21)
+
+
+doc = App.open("C:\\telescope\\CAD\\v1\\mounting.FCStd")
+doc.base.Placement=App.Placement(App.Vector(0,0,0), App.Rotation(-30,0,0), App.Vector(0,0,0))

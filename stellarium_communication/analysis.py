@@ -1,4 +1,3 @@
-from matplotlib import pyplot as plt
 from charts.chart_angle import ChartAngle
 from charts.chart_position import ChartPosition
 from telescope_control.calculate_parameters import calculate_parameters
@@ -27,8 +26,8 @@ class Analysis():
             logging.debug("\nBye!")
 
     def stellarium_api_communication(self):
-        # chart_angle = ChartAngle(self.queue, ["Telescope angles - q1/q2", "Telescope velocity - dq1/dq2", "Telescope aceleration - ddq1/ddq2", "Torque"])
-        # chart_stellarium = ChartAngle(self.queue, ["Stellarium angles - Al/Az", "Stellarium velocity - Al/Az", "Stellarium aceleration - Al/Az", ""])
+        chart_angle = ChartAngle(self.queue, ["Telescope angles - q1/q2", "Telescope velocity - dq1/dq2", "Telescope aceleration - ddq1/ddq2", "Torque"])
+        chart_stellarium = ChartAngle(self.queue, ["Stellarium angles - Al/Az", "Stellarium velocity - Al/Az", "Stellarium aceleration - Al/Az", ""])
         chart_position = ChartPosition(self.queue)
         while True:
             self.queue.get()   
@@ -38,8 +37,8 @@ class Analysis():
             
             [stelarium_coordinates, telescope_coordinates, positions] = calculate_parameters(az, al)
 
-            # chart_angle.plot_chart(telescope_coordinates)
-            # chart_stellarium.plot_chart(stelarium_coordinates)
+            chart_angle.plot_chart(telescope_coordinates)
+            chart_stellarium.plot_chart(stelarium_coordinates)
             chart_position.plot_chart(positions)
 
             self.queue.task_done()

@@ -1,45 +1,63 @@
 #include <SoftwareSerial.h>
 #include <stdio.h>
 #include <string.h>
-SoftwareSerial EEBlue(10, 11); // RX | TX
+
+#define bluetoothRX 10
+#define bluetoothTX 11
+
+SoftwareSerial bluetooth(bluetoothRX, bluetoothTX); // RX | TX
+
+String deviceString = "";
+bool deviceStringComplete = false;
+
+void bluetoothEvent();
+
+void getCoordinates(String inputData, float *coordinates);
+
 void setup()
 { 
   Serial.begin(9600);
-  EEBlue.begin(9600);
-  Serial.println("Application Started. \n\n"); 
+  Serial.println("Application Started");
 }
 
-//function to convert string to byte array
-byte[] string2ByteArray(bvte* input, byte[] output)
-{
-    int loop;
-    int i;    
-    byte[] output;
-    loop = 0;
-    i = 0;    
-    while(input[loop] != '\0')
-    {
-        output[i++] = input[loop++];
-    }
-    return output;
-}
- 
 void loop()
-{
- String data_received;
- char* data_received_byte[100];
+{  
+  bluetooth.begin(9600);
+  bluetooth.listen();
+  bluetoothEvent();
+  if (deviceString == "IS_ALIVE") {
+    bluetooth.write("YES");
+    Serial.println("Connected!");
+  }else if(deviceString != ""){
+    float coordinates[2];
+    getCoordinates(deviceString, coordinates);
 
-  if (EEBlue.available()){
-    data_received = EEBlue.readString();
-    data_received_byte = string2ByteArray(data_received, data_received_byte);
-    if(data_received == "IS_ALIVE")
-       EEBlue.write("YES");
-    if(Serial.available() > 0)
-      Serial.write(data_received_byte);
-    //data_received_byte = '\0'
+    // values ready to be used in coordinates[2]
   }
-    //Serial.write(EEBlue.read());
- 
-  // Feed all data from termial to bluetooth
-  
 }
+
+void getCoordinates(String inputData, float *coordinates){
+  char delim[] = ",";
+  char* cstr = new char[inputData.length() +1]; 
+  strcpy(cstr, inputData.c_str()); 
+  char *ptr = strtok(cstr, delim);
+
+  coordinates[0] = atof(ptr);
+  coordinates[1] = atof(strtok(NULL, delim));
+}
+
+void bluetoothEvent()
+{
+  deviceString.reserve(30);
+  deviceString = "";
+  while (bluetooth.available()) {
+    char inchar = (char) bluetooth.read();
+    if (inchar == '\r')
+        bluetooth.end();
+    else
+      deviceString += inchar;
+  }
+
+  delay(300);
+}
+  

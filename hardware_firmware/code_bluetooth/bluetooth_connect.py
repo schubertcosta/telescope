@@ -30,7 +30,7 @@ def check_connection(serial_port):
     connecting_attempts = 5
 
     while(serialString == ""):
-        serial_port.write(b"IS_ALIVE")
+        serial_port.write(b"IS_ALIVE\r")
 
         if(serial_port.in_waiting > 0):
 

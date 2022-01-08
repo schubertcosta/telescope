@@ -1,5 +1,7 @@
 import time
 import sys
+
+from sympy.matrices.dense import eye
 sys.path.insert(1, '../../../telescope')
 import constants
 import serial.tools.list_ports
@@ -22,8 +24,13 @@ def main():
     check_connection(serial_port)
 
     while(1):
-        motor_angles = input("Enter the motor position as [Az,Al]: ")
-        serial_port.write(motor_angles.encode())
+        # here we will get the data from the thread
+        coordinates = input("Enter the motor position as [Az,Al]: ")
+        motor_coordinates = convert_coordinates(coordinates)
+        serial_port.write(motor_coordinates.encode())
+
+def convert_coordinates(coordinates):
+    return coordinates*(eye(2)*(constants.gear_radius[0]/constants.gear_radius[1])/constants.motor_step)
 
 def check_connection(serial_port):
     serialString = ""   
@@ -33,7 +40,6 @@ def check_connection(serial_port):
         serial_port.write(b"IS_ALIVE\r")
 
         if(serial_port.in_waiting > 0):
-
             # Read data out of the buffer until a carraige return / new line is found
             serialString = serial_port.readline()
 

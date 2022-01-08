@@ -32,7 +32,7 @@ void loop()
     float coordinates[2];
     getCoordinates(deviceString, coordinates);
 
-    // values ready to be used in coordinates[2]
+    // values ready to be used in coordinates
   }
 }
 

@@ -39,3 +39,8 @@ II22 = Matrix([[0.01757, 0, 0], [0, 0.06109, 0], [0, 0, 0.06803]])
 # manually inputed center of mass
 # Pg22 = Matrix([-0.22, 0, 0, 1])
 # II22 = Matrix([[0.01757, 0, 0], [0, 0.16681, 0], [0, 0, 0.17374]])
+
+telescope_COM_port = "COM8"
+gear_radius = [0.045, 0.0185]
+# 0.1125 degrees per step
+motor_step = 1.8/16

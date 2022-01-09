@@ -109,7 +109,8 @@ def calculate_parameters(az, al, is_live_mode = False):
     global last_xyz_position
 
     if not (verify_route(az, constants.az_limit) and verify_route(al, constants.al_limit)):
-        return [last_xyz_position]
+        print("There are values out of the range: Range -> %s , Current Values - > %s" % ([constants.az_limit, constants.al_limit],[az, al]))
+        quit()
     (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]    
 
     [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_fifth_order_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
@@ -152,7 +153,6 @@ def calculate_parameters(az, al, is_live_mode = False):
             TN = T1 + T2 + T3   
 
             torque.append(TN.T)
-        
     return [[to_degrees(stellarium_angles), to_degrees(d_stellarium_angles), to_degrees(dd_stellarium_angles), []], [to_degrees(q), to_degrees(dq), to_degrees(ddq), torque], positions]
 
 def verify_route(angle, range):

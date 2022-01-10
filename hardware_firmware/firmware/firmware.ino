@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define bluetoothRX 10
-#define bluetoothTX 11
+#define bluetoothRX 3
+#define bluetoothTX 4
 #define AZ_MOTOR_DIR 6
 #define AZ_MOTOR_PIN 5
 #define AL_MOTOR_DIR 7
@@ -47,15 +47,25 @@ void loop()
     Serial.println("Connected!");
   }else if(deviceString != ""){
     float coordinates[2];
+    bool motorsPositioned = false;
+    
     getCoordinates(deviceString, coordinates);
 
+    Serial.print("Target positions: ");
+    Serial.println(deviceString);
+    
     azMotor.moveTo(coordinates[0]);
     alMotor.moveTo(coordinates[1]);
 
-    while(azMotor.distanceToGo() != 0)
+    while(motorsPositioned == false){
+      if(azMotor.distanceToGo() != 0)
         azMotor.run();
-    while(alMotor.distanceToGo() != 0)
-        alMotor.run();
+      if(alMotor.distanceToGo() != 0)
+        alMotor.run();      
+      
+      motorsPositioned = azMotor.distanceToGo() == 0 && alMotor.distanceToGo() == 0;
+    }
+    Serial.println("Motors positioned!");    
   }
 }
 

@@ -15,8 +15,12 @@ Als = Symbol('Al')
 Azs = Symbol('Az')
 rs = Symbol('r')
 
+l1s = robot["l1"][2]
+l2s = robot["l2"][0]
+
 qs = symbols('q1:3')
 dqs = Matrix(symbols('dq1:3'))
+
 R10 = utils.rotate_matrix('z', qs[0])
 D10 = utils.position_matrix(robot["l1"])
 T10 = R10*D10
@@ -45,9 +49,6 @@ T20_T = T10_T*T21_T
 T20_T_radius_adapted = T20_T.subs([(rs, T30[0:3,3].norm())])
 
 # Calculating equation for q1 and q2
-l1s = robot["l1"][2]
-l2s = robot["l2"][0]
-
 q1s = [Azs]
 
 A = (l2s/cos(Als))**2
@@ -99,8 +100,7 @@ ddLdqpdt = diff(Matrix(dLdqp).subs([(qs[0], q_L[0]), (qs[1], q_L[1]), (dqs[0], d
 # That is the telescope last position
 last_position = constants.initial_position
 last_q_position = constants.initial_q_position
-last_xyz_position = constants.initial_xyz_position
-  
+last_xyz_position = constants.initial_xyz_position  
         
 to_degrees = np.vectorize(math.degrees, otypes=[list])
 
@@ -109,15 +109,13 @@ def calculate_parameters(az, al, is_live_mode = False):
     global last_q_position
     global last_xyz_position
 
-    logging.debug((az, al)) 
-
     if not (verify_route(az, constants.az_limit) and verify_route(al, constants.al_limit)):
         print("There are values out of the range: Range -> %s , Current Values - > %s" % ([constants.az_limit, constants.al_limit],[az, al]))
         quit()
     (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]   
 
     
-    logging.debug((az, al)) 
+    logging.debug((math.degrees(az), math.degrees(al))) 
 
     [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_fifth_order_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
     positions = []
@@ -128,15 +126,12 @@ def calculate_parameters(az, al, is_live_mode = False):
         q2 = get_best_q(q2s, [(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1])], constants.q2_limit, 2, last_q_position[1])
 
         last_q_position = [q1, q2]
-        
         q.append(last_q_position)
         last_position = next_intermediate_angle
         
         if is_live_mode == False:
             last_xyz_position = T20_T_radius_adapted[0:3,3].subs([(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1]), (Azs, next_intermediate_angle[0]), (qs[0], q1), (qs[1], q2)])
             positions.append(last_xyz_position)
-
-            pprint(positions)
 
             ## Calculating velocity
             V = np.array([0.0, 0.0, 0.0, 0, d_stellarium_angles[index][1], d_stellarium_angles[index][0]])
@@ -162,8 +157,7 @@ def calculate_parameters(az, al, is_live_mode = False):
             TN = T1 + T2 + T3   
 
             torque.append(TN.T)
-    
-    logging.debug(q)
+
     return [[to_degrees(stellarium_angles), to_degrees(d_stellarium_angles), to_degrees(dd_stellarium_angles), []], [to_degrees(q), to_degrees(dq), to_degrees(ddq), torque], positions]
 
 def verify_route(angle, range):

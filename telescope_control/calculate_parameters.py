@@ -114,8 +114,7 @@ def calculate_parameters(az, al, is_live_mode = False):
         quit()
     (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]   
 
-    
-    logging.debug((math.degrees(az), math.degrees(al))) 
+    logging.debug("Set position to: Az = %f, Al = %f " % (math.degrees(az), math.degrees(al))) 
 
     [stellarium_angles, d_stellarium_angles, dd_stellarium_angles] =  utils.get_fifth_order_parametrization(last_position, [az, al], constants.time_for_each_moviment, constants.steps)
     positions = []

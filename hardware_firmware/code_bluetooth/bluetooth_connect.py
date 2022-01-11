@@ -1,3 +1,4 @@
+import logging
 import time
 import sys
 import numpy as np
@@ -16,30 +17,19 @@ import serial
     #     coordinates.append(float(input()))
     #     motor_coordinates = convert_coordinates(coordinates)
     #     serial_port.write(motor_coordinates.encode())
-class TelescopeConnect():        
-    def move_motors(self, target_coordinates):
-        coordinates = target_coordinates[0]
-        print(coordinates)
-        # motor_coordinates = self.convert_coordinates(coordinates)
-        # self.serial_port.write(motor_coordinates.encode())
-
-    def convert_coordinates(coordinates):
-        conversion_matrix = (eye(2)*((constants.gear_radius[0]/constants.gear_radius[1])/constants.motor_step))
-        motor_position = np.matmul(np.array(coordinates), conversion_matrix)
-        return "%f,%f" % (motor_position[0], motor_position[1])
-
-    def check_connection(self):
+class TelescopeConnect():    
+    def __init__(self):
         ports = serial.tools.list_ports.comports()
         port_names = [port.name for port in ports]
         if(constants.telescope_COM_port not in port_names):
-            print("%s port not found, exiting program..." % constants.telescope_COM_port)
+            logging.debug("%s port not found, exiting program..." % constants.telescope_COM_port)
             quit()
 
         try:
             self.serial_port = serial.Serial(port = constants.telescope_COM_port, baudrate=9600,
                                 bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE)
         except:
-            print("Error when connecting with serial port")
+            logging.debug("Error when connecting with serial port")
             quit()
 
         serialString = ""   
@@ -55,14 +45,26 @@ class TelescopeConnect():
                 # Print the contents of the serial data
                 data_received = (serialString.decode('Ascii'))
                 if(data_received == "YES"):
+                    logging.debug("Telescope connected via Bluetooth!")
                     return
                 
             if(connecting_attempts == 0):
-                print("Failed to coonect with device")
+                logging.debug("Failed to coonect with device")
                 quit()
             else:
+                logging.debug("Attempt %s to connect with bluetooth" % connecting_attempts)
                 connecting_attempts -= 1
                 time.sleep(2)
+
+    def move_motors(self, target_coordinates):
+        coordinates = target_coordinates[-1]
+        motor_coordinates = self.convert_coordinates(coordinates)
+        self.serial_port.write(motor_coordinates.encode())
+
+    def convert_coordinates(self, coordinates):
+        conversion_matrix = eye(2)*((constants.gear_radius[0]/constants.gear_radius[1])/constants.motor_step)
+        motor_position = np.matmul(coordinates, conversion_matrix)
+        return "%d,%d" % (motor_position[0], motor_position[1])    
 
 if __name__ == '__main__':
     TelescopeConnect()

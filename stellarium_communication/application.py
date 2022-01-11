@@ -1,4 +1,4 @@
-# from hardware_firmware.code_bluetooth.bluetooth_connect import TelescopeConnect
+from hardware_firmware.code_bluetooth.bluetooth_connect import TelescopeConnect
 from telescope_control.calculate_parameters import calculate_parameters
 from telescope_server import Telescope_Server
 from queue import Queue
@@ -26,9 +26,9 @@ class Application():
             logging.debug("\nBye!")
         
     def stellarium_api_communication(self):
-        freecad = FreeCadAnimation()
-        # telescope_connection = TelescopeConnect()
-        # telescope_connection.check_connection()
+        # freecad = FreeCadAnimation()
+        telescope_connection = TelescopeConnect()
+
         while True:
             self.queue.get()   
 
@@ -37,12 +37,12 @@ class Application():
 
             [stelarium_coordinates, telescope_coordinates, positions] = calculate_parameters(az, al, True)
 
-            # telescope_connection.move_motors(telescope_coordinates)
-            freecad.set_position(telescope_coordinates[0])
+            telescope_connection.move_motors(telescope_coordinates[0])
+            # freecad.set_position(telescope_coordinates[0])
 
-            if self.queue:
-                while self.queue.empty():
-                    freecad.free_gui()
+            # if self.queue:
+            #     while self.queue.empty():
+            #         freecad.free_gui()
 
             self.queue.task_done()
 

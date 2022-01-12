@@ -49,7 +49,7 @@ T20_T = T10_T*T21_T
 T20_T_radius_adapted = T20_T.subs([(rs, T30[0:3,3].norm())])
 
 # Calculating equation for q1 and q2
-q1s = [Azs]
+q1s = [[Azs, Azs-2*pi], [Azs, Azs+2*pi]]
 
 A = (l2s/cos(Als))**2
 B = l2s**2 + l1s**2
@@ -112,7 +112,7 @@ def calculate_parameters(az, al, is_live_mode = False):
     if not (verify_route(az, constants.az_limit) and verify_route(al, constants.al_limit)):
         print("There are values out of the range: Range -> %s , Current Values - > %s" % ([constants.az_limit, constants.al_limit],[az, al]))
         quit()
-    (az, al) = [get_faster_route([az, az-2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]   
+    (az, al) = [get_faster_route([az, az-2*pi] if az >= 0 else [az, az+2*pi], last_position[0]), get_faster_route([al, al-2*pi] if al >= 0 else [al, al+2*pi], last_position[1])]   
 
     logging.debug("Set position to: Az = %f, Al = %f " % (math.degrees(az), math.degrees(al))) 
 
@@ -121,7 +121,7 @@ def calculate_parameters(az, al, is_live_mode = False):
     q, dq, ddq, torque = [[],[],[], []]
 
     for index, next_intermediate_angle in enumerate(stellarium_angles):
-        q1 = get_best_q(q1s, [(Azs, next_intermediate_angle[0])], constants.q1_limit, 1, last_q_position[0])
+        q1 = get_best_q(q1s[0] if az >= 0 else q1s[1], [(Azs, next_intermediate_angle[0])], constants.q1_limit, 1, last_q_position[0])
         q2 = get_best_q(q2s, [(l1s, constants.l1), (l2s, constants.l2), (Als, next_intermediate_angle[1])], constants.q2_limit, 2, last_q_position[1])
 
         last_q_position = [q1, q2]

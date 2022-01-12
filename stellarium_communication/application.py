@@ -7,7 +7,7 @@ import logging
 import time
 import stellarium_api
 import coords
-from freecad.freecad_animation import FreeCadAnimation
+# from freecad.freecad_animation import FreeCadAnimation
 
 class Application():
     def __init__(self):
@@ -27,7 +27,7 @@ class Application():
         
     def stellarium_api_communication(self):
         # freecad = FreeCadAnimation()
-        telescope_connection = TelescopeConnect()
+        # telescope_connection = TelescopeConnect()
 
         while True:
             self.queue.get()   
@@ -37,7 +37,7 @@ class Application():
 
             [stelarium_coordinates, telescope_coordinates, positions] = calculate_parameters(az, al, True)
 
-            telescope_connection.move_motors(telescope_coordinates[0])
+            # telescope_connection.move_motors(telescope_coordinates[0])
             # freecad.set_position(telescope_coordinates[0])
 
             # if self.queue:

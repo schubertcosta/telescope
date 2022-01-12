@@ -62,7 +62,7 @@ class TelescopeConnect():
         self.serial_port.write(motor_coordinates.encode())
 
     def convert_coordinates(self, coordinates):
-        conversion_matrix = eye(2)*((constants.gear_radius[0]/constants.gear_radius[1])/constants.motor_step)
+        conversion_matrix = eye(2)*((constants.gear_radius[0]/constants.gear_radius[1])/constants.motor_step_degree)
         motor_position = np.matmul(coordinates, conversion_matrix)
         return "%d,%d" % (motor_position[0], motor_position[1])    
 

@@ -20,22 +20,22 @@ void setup() {
   azMotor.setMaxSpeed(1000);
   azMotor.setAcceleration(6400);
   azMotor.setSpeed(200);
-  azMotor.moveTo(6400);
+  azMotor.moveTo(200);
   
   alMotor.setMaxSpeed(1000);
   alMotor.setAcceleration(6400);
   alMotor.setSpeed(200);
-  alMotor.moveTo(6400);
+  alMotor.moveTo(200);
 }
 
 void loop() {
   // Change direction once the motor reaches target position
   if (azMotor.distanceToGo() == 0) 
-    azMotor.moveTo(-azMotor.currentPosition());
+    azMotor.moveTo(azMotor.currentPosition() + 200);
 
    
   if (alMotor.distanceToGo() == 0) 
-    alMotor.moveTo(-alMotor.currentPosition());
+    alMotor.moveTo(200);
 
   // Move the motor one step
   alMotor.run();

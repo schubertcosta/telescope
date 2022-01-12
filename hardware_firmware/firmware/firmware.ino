@@ -54,8 +54,8 @@ void loop()
     Serial.print("Target positions: ");
     Serial.println(deviceString);
     
-    azMotor.moveTo(coordinates[0]);
-    alMotor.moveTo(coordinates[1]);
+    azMotor.moveTo(azMotor.currentPosition() + coordinates[0]);
+    alMotor.moveTo(alMotor.currentPosition() + coordinates[1]);
 
     while(motorsPositioned == false){
       if(azMotor.distanceToGo() != 0)

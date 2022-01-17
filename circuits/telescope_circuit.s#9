@@ -12534,21 +12534,13 @@ W = angled&lt;p&gt;
 <junction x="119.38" y="20.32"/>
 </segment>
 </net>
-<net name="N$7" class="0">
-<segment>
-<pinref part="R2" gate="G$1" pin="1"/>
-<wire x1="109.22" y1="27.94" x2="109.22" y2="22.86" width="0.1524" layer="91"/>
-<pinref part="U2" gate="G$1" pin="PB3(MOSI/OC2)"/>
-<wire x1="109.22" y1="22.86" x2="99.06" y2="22.86" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$9" class="0">
 <segment>
-<wire x1="139.7" y1="17.78" x2="111.76" y2="17.78" width="0.1524" layer="91"/>
-<pinref part="U2" gate="G$1" pin="PB2(SS/OC1B)"/>
+<wire x1="139.7" y1="17.78" x2="101.6" y2="17.78" width="0.1524" layer="91"/>
 <pinref part="BLUETOOTH" gate="G$1" pin="3"/>
-<wire x1="99.06" y1="25.4" x2="111.76" y2="25.4" width="0.1524" layer="91"/>
-<wire x1="111.76" y1="25.4" x2="111.76" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="17.78" x2="101.6" y2="45.72" width="0.1524" layer="91"/>
+<pinref part="U2" gate="G$1" pin="PD3(INT1)"/>
+<wire x1="101.6" y1="45.72" x2="99.06" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$12" class="0">
@@ -12617,24 +12609,6 @@ W = angled&lt;p&gt;
 <pinref part="AL_CONTROLLER" gate="G$1" pin="!RST"/>
 <pinref part="AL_CONTROLLER" gate="G$1" pin="!SLP"/>
 <wire x1="132.08" y1="48.26" x2="132.08" y2="45.72" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$18" class="0">
-<segment>
-<pinref part="AL_CONTROLLER" gate="G$1" pin="DIR"/>
-<wire x1="132.08" y1="40.64" x2="129.54" y2="40.64" width="0.1524" layer="91"/>
-<wire x1="129.54" y1="40.64" x2="129.54" y2="30.48" width="0.1524" layer="91"/>
-<pinref part="U2" gate="G$1" pin="PB0(ICP)"/>
-<wire x1="129.54" y1="30.48" x2="99.06" y2="30.48" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$20" class="0">
-<segment>
-<pinref part="AL_CONTROLLER" gate="G$1" pin="STEP"/>
-<wire x1="132.08" y1="43.18" x2="127" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="U2" gate="G$1" pin="PD7(AIN1)"/>
-<wire x1="127" y1="43.18" x2="127" y2="35.56" width="0.1524" layer="91"/>
-<wire x1="127" y1="35.56" x2="99.06" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$21" class="0">
@@ -12715,6 +12689,33 @@ W = angled&lt;p&gt;
 <wire x1="-20.32" y1="12.7" x2="-20.32" y2="17.78" width="0.1524" layer="91"/>
 <wire x1="-20.32" y1="17.78" x2="-20.32" y2="25.4" width="0.1524" layer="91"/>
 <junction x="-20.32" y="17.78"/>
+</segment>
+</net>
+<net name="N$18" class="0">
+<segment>
+<pinref part="AL_CONTROLLER" gate="G$1" pin="DIR"/>
+<wire x1="132.08" y1="40.64" x2="129.54" y2="40.64" width="0.1524" layer="91"/>
+<wire x1="129.54" y1="40.64" x2="129.54" y2="35.56" width="0.1524" layer="91"/>
+<pinref part="U2" gate="G$1" pin="PD7(AIN1)"/>
+<wire x1="129.54" y1="35.56" x2="99.06" y2="35.56" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$20" class="0">
+<segment>
+<pinref part="AL_CONTROLLER" gate="G$1" pin="STEP"/>
+<wire x1="132.08" y1="43.18" x2="127" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="127" y1="43.18" x2="127" y2="30.48" width="0.1524" layer="91"/>
+<pinref part="U2" gate="G$1" pin="PB0(ICP)"/>
+<wire x1="127" y1="30.48" x2="99.06" y2="30.48" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$7" class="0">
+<segment>
+<pinref part="R2" gate="G$1" pin="1"/>
+<wire x1="109.22" y1="27.94" x2="104.14" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="27.94" x2="104.14" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="U2" gate="G$1" pin="PD4(XCK/T0)"/>
+<wire x1="104.14" y1="43.18" x2="99.06" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

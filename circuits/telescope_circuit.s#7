@@ -12222,8 +12222,8 @@ W = angled&lt;p&gt;
 </classes>
 <parts>
 <part name="U2" library="SparkFun-IC-Microcontroller" library_urn="urn:adsk.eagle:library:525" deviceset="ATMEGA328P_PDIP_EZ" device="" package3d_urn="urn:adsk.eagle:package:38949/1"/>
-<part name="C1" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="22PF" device="-0603-50V-5%" package3d_urn="urn:adsk.eagle:package:37414/1" value="22pF"/>
-<part name="C2" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="22PF" device="-0603-50V-5%" package3d_urn="urn:adsk.eagle:package:37414/1" value="22pF"/>
+<part name="C1" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="22PF" device="-PTH-2.54MM-200V-5%" package3d_urn="urn:adsk.eagle:package:37435/1" value="22pF"/>
+<part name="C2" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="22PF" device="-PTH-2.54MM-200V-5%" package3d_urn="urn:adsk.eagle:package:37435/1" value="22pF"/>
 <part name="Y1" library="SparkFun-Clocks" library_urn="urn:adsk.eagle:library:511" deviceset="CRYSTAL-16MHZ" device="PTH-HC49US" package3d_urn="urn:adsk.eagle:package:37515/1" value="16MHz"/>
 <part name="C5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="E2.5-6" package3d_urn="urn:adsk.eagle:package:23349/1" value="47uF"/>
 <part name="C6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="E2.5-6" package3d_urn="urn:adsk.eagle:package:23349/1" value="470uF"/>
@@ -12378,11 +12378,6 @@ W = angled&lt;p&gt;
 <junction x="25.4" y="22.86"/>
 <pinref part="C2" gate="G$1" pin="2"/>
 <junction x="27.94" y="50.8"/>
-<pinref part="U2" gate="G$1" pin="GND@1"/>
-<wire x1="27.94" y1="22.86" x2="50.8" y2="22.86" width="0.1524" layer="91"/>
-<junction x="27.94" y="22.86"/>
-<pinref part="U2" gate="G$1" pin="GND@2"/>
-<wire x1="50.8" y1="20.32" x2="50.8" y2="22.86" width="0.1524" layer="91"/>
 <pinref part="J2" gate="G$1" pin="GNDBREAK"/>
 <pinref part="J2" gate="G$1" pin="GND"/>
 <wire x1="-17.78" y1="12.7" x2="-15.24" y2="12.7" width="0.1524" layer="91"/>
@@ -12428,6 +12423,12 @@ W = angled&lt;p&gt;
 <wire x1="157.48" y1="33.02" x2="106.68" y2="33.02" width="0.1524" layer="91"/>
 <junction x="157.48" y="33.02"/>
 <junction x="106.68" y="33.02"/>
+<pinref part="U2" gate="G$1" pin="GND@2"/>
+<wire x1="50.8" y1="20.32" x2="27.94" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="20.32" x2="27.94" y2="22.86" width="0.1524" layer="91"/>
+<junction x="27.94" y="22.86"/>
+<pinref part="U2" gate="G$1" pin="GND@1"/>
+<wire x1="50.8" y1="22.86" x2="27.94" y2="22.86" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$6" class="0">
@@ -12538,9 +12539,9 @@ W = angled&lt;p&gt;
 <segment>
 <wire x1="139.7" y1="17.78" x2="101.6" y2="17.78" width="0.1524" layer="91"/>
 <pinref part="BLUETOOTH" gate="G$1" pin="3"/>
-<wire x1="101.6" y1="17.78" x2="101.6" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="U2" gate="G$1" pin="PD4(XCK/T0)"/>
-<wire x1="101.6" y1="43.18" x2="99.06" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="17.78" x2="101.6" y2="45.72" width="0.1524" layer="91"/>
+<pinref part="U2" gate="G$1" pin="PD3(INT1)"/>
+<wire x1="101.6" y1="45.72" x2="99.06" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$12" class="0">
@@ -12713,9 +12714,9 @@ W = angled&lt;p&gt;
 <segment>
 <pinref part="R2" gate="G$1" pin="1"/>
 <wire x1="109.22" y1="27.94" x2="104.14" y2="27.94" width="0.1524" layer="91"/>
-<wire x1="104.14" y1="27.94" x2="104.14" y2="45.72" width="0.1524" layer="91"/>
-<pinref part="U2" gate="G$1" pin="PD3(INT1)"/>
-<wire x1="104.14" y1="45.72" x2="99.06" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="27.94" x2="104.14" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="U2" gate="G$1" pin="PD4(XCK/T0)"/>
+<wire x1="104.14" y1="43.18" x2="99.06" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
